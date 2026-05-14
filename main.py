@@ -1,7 +1,7 @@
 """AI 自我探索工具 — FastAPI 服务入口。
 
 提供两个核心 API：
-- POST /api/chart  — 计算星盘/八字/星宿综合画像
+- POST /api/chart  — 计算星盘/五行能量/星宿综合画像
 - POST /api/chat   — 与 AI 对话（流式 SSE）
 - GET  /           — 前端页面
 """
@@ -64,7 +64,7 @@ async def index():
 
 @app.post("/api/chart")
 async def api_chart(request: Request, body: ChartRequest):
-    """计算综合画像（星盘 + 八字 + 星宿）。"""
+    """计算综合画像（星盘 + 五行能量 + 星宿）。"""
     # 限流
     client_ip = request.client.host if request.client else "unknown"
     if not chart_limiter.allow(client_ip):
@@ -94,7 +94,7 @@ async def api_chart(request: Request, body: ChartRequest):
             lon=body.longitude,
         )
 
-        # 2. 计算八字 (含真太阳时校正)
+        # 2. 计算五行能量 (含真太阳时校正)
         bazi_result = compute_bazi(
             birth_date=birth_date,
             birth_hour=birth_hour,

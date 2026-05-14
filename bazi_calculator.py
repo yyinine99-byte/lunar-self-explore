@@ -1,4 +1,4 @@
-"""八字四柱计算 - 纯 Python 实现。
+"""五行能量四柱计算 - 纯 Python 实现。
 
 计算逻辑：
 - 年柱：以立春为界，基于60甲子循环
@@ -214,7 +214,7 @@ def _adjust_to_true_solar_time(birth_hour: float, longitude: float, timezone_off
 
 def compute_bazi(birth_date: datetime.date, birth_hour: int, gender: str = "",
                  longitude: float = 120.0, timezone_offset: int = 8) -> Dict:
-    """计算完整八字。
+    """计算完整五行能量四柱。
 
     Args:
         birth_date: 公历出生日期

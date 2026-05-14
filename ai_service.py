@@ -29,7 +29,7 @@ def build_messages(chart_data: dict, user_message: str, history: Optional[list] 
     确保 AI 始终能参考这些数据。
 
     Args:
-        chart_data: 完整的计算结果（星盘+八字+星宿）
+        chart_data: 完整的计算结果（星盘+五行能量+星宿）
         user_message: 用户当前消息
         history: 之前的对话历史
 
@@ -59,12 +59,12 @@ def build_messages(chart_data: dict, user_message: str, history: Optional[list] 
 元素分布：火{chart_info.get('element_distribution', {}).get('火', 0)} 土{chart_info.get('element_distribution', {}).get('土', 0)} 风{chart_info.get('element_distribution', {}).get('风', 0)} 水{chart_info.get('element_distribution', {}).get('水', 0)}
 行星位置：{', '.join([f"{p.get('name_cn','')}{p.get('sign','')}{p.get('degree_in_sign','')}°" for p in planets if p.get('name_cn')]) if planets else 'N/A'}""")
 
-    # 八字关键信息
+    # 五行能量关键信息
     if bazi_info:
         pillars_text = ""
         for p in bazi_info.get("pillars", []):
             pillars_text += f"{p.get('name', '')}: {p.get('stem', '')}{p.get('branch', '')} ({p.get('element', '')}) | "
-        context_blocks.append(f"""【八字数据】
+        context_blocks.append(f"""【五行能量数据】
 日主：{bazi_info.get('day_master', 'N/A')}（{bazi_info.get('day_master_element', '')}·{bazi_info.get('day_master_yin_yang', '')}）
 四柱：{pillars_text}
 十神：{bazi_info.get('ten_gods', {})}

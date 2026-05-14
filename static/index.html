@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>AI 自我探索</title>
+<title>AI 自我探索 — 性格分析与自我认知工具</title>
+<meta name="description" content="本工具为性格分析/自我探索用途，仅供娱乐参考，非算命、非预测、非决策依据。基于出生信息的星盘与五行能量画像。">
 <style>
   :root {
     --bg: #0d0d13;
@@ -314,7 +315,8 @@
     <div class="s1-header">
       <div class="emoji">🔍</div>
       <h1>开始自我探索</h1>
-      <p>输入你的信息，获取综合画像</p>
+      <p>输入你的信息，获取性格分析综合画像</p>
+      <p style="font-size:11px;color:var(--text-muted);margin-top:6px;">仅供娱乐参考，非算命、非预测、非决策依据</p>
     </div>
 
     <div class="form-group">
@@ -354,7 +356,7 @@
     <button class="btn btn-primary" id="btn-generate" onclick="generateChart()">
       ✦ 生成我的画像
     </button>
-    <p class="privacy-note">数据仅用于本次计算，不会上传至任何服务器</p>
+    <p class="privacy-note">本工具为性格分析/自我探索用途，仅供娱乐参考。数据仅用于本次计算，不会上传至任何服务器。</p>
   </div>
 
   <!-- ═══ Screen 2: Portrait ═══ -->
@@ -1114,7 +1116,7 @@ function renderPortrait(data) {
   // Tagline
   html += `<div class="tagline-box">
     <div class="tagline">${tagline || '正在生成画像...'}</div>
-    <div class="tagline-sub">基于星盘·八字·星宿的综合画像</div>
+    <div class="tagline-sub">基于星盘·五行能量·星宿的综合画像</div>
   </div>`;
 
   // Toggle
@@ -1159,7 +1161,7 @@ function renderPortrait(data) {
 
     // Bazi table
     html += `<div class="pcard">
-      <div class="pcard-head"><div class="pcard-icon">🔮</div><div class="pcard-title">八字四柱</div></div>
+      <div class="pcard-head"><div class="pcard-icon">🔮</div><div class="pcard-title">五行能量配置</div></div>
       <div class="pcard-content">
       <table class="data-table"><tr><th>柱</th><th>干支</th><th>五行</th><th>藏干</th><th>纳音</th></tr>`;
     if (pillars.length >= 4) {
@@ -1217,7 +1219,7 @@ function renderPortrait(data) {
   html += `<div class="suggest-card">
     <div class="suggest-title">📍 下一步建议</div>
     <div class="suggest-list">
-      <div class="suggest-item" onclick="startChat();setTimeout(()=>sendQuick('结合我的星盘和八字，我最大的天赋盲区是什么？'),300)">
+      <div class="suggest-item" onclick="startChat();setTimeout(()=>sendQuick('结合我的星盘和五行能量，我最大的天赋盲区是什么？'),300)">
         <div class="suggest-num">1</div>
         <div>探索天赋盲区 — 了解你${sunSign ? '作为'+sunSign : ''}的优势与隐藏短板</div>
       </div>
@@ -1225,7 +1227,7 @@ function renderPortrait(data) {
         <div class="suggest-num">2</div>
         <div>看清关系模式 — 你会发现重复的互动模式背后有规律</div>
       </div>
-      <div class="suggest-item" onclick="startChat();setTimeout(()=>sendQuick('我当前阶段应该聚焦什么？适合打工还是创业？'),300)">
+      <div class="suggest-item" onclick="startChat();setTimeout(()=>sendQuick('我当前阶段更偏好稳定探索还是冒险突破？'),300)">
         <div class="suggest-num">3</div>
         <div>找到方向 — 基于${dayMaster ? '日主'+dayMaster+'的特质' : '你的配置'}，找到最适合的发力点</div>
       </div>
@@ -1298,25 +1300,25 @@ function startChat() {
 // Tab questions
 const TAB_QUESTIONS = {
   talent: [
-    '我更适合打工还是创业？',
-    '我更适合与人合作还是单干？',
-    '我最大的隐藏优势是什么？',
-    '哪些能力是我自己没意识到的？',
-    '我的创造力和执行力哪个更强？',
+    '我在工作中更偏向稳健执行还是自主探索？',
+    '我在团队协作和独立作战中哪个状态更好？',
+    '我性格中最大的隐藏优势是什么？',
+    '哪些能力倾向是我自己没意识到的？',
+    '我的创造力和专注力哪个更突出？',
   ],
   relation: [
-    '我和亲人相处需要注意哪些问题？',
-    '我和同事相处需要注意哪些问题？',
-    '我和恋人相处需要注意哪些问题？',
-    '什么样的恋人更加适配我？',
+    '我和亲近的人相处时，哪些沟通方式更适合我？',
+    '我在工作环境中的人际互动有什么特点？',
+    '我在亲密关系中容易产生什么误解和摩擦？',
+    '从我的性格看，什么样的相处模式更适合我？',
     '我在人际关系中容易踩什么坑？',
   ],
   direction: [
-    '我适合的行业以及具体的岗位有哪些？',
-    '当前阶段我应该聚焦什么方向？',
-    '我该如何突破目前的瓶颈？',
-    '未来3年我的关键节点是什么？',
-    '什么样的工作节奏最适合我？',
+    '以我的性格倾向，哪些行业和岗位更适合发挥优势？',
+    '当前阶段我可以在哪个方向投入精力？',
+    '面对瓶颈期，我的性格特质能帮到我什么？',
+    '从自我成长角度看，我接下来可以关注哪些方面？',
+    '什么样的工作节奏和我的内在节奏更合拍？',
   ]
 };
 
