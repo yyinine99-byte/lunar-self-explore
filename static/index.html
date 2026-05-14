@@ -33,7 +33,6 @@
     position: relative; overflow: hidden;
   }
 
-  /* Noise overlay */
   .noise {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     pointer-events: none; z-index: 99; opacity: 0.025;
@@ -41,27 +40,17 @@
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 128 128' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='128' height='128' filter='url(%23n)' opacity='0.8'/%3E%3C/svg%3E");
   }
 
-  /* Screen management */
   .screen { display: none; padding: 40px 28px 32px; }
   .screen.active { display: block; }
 
   /* ── Screen 1: Input ── */
-  .s1-header { text-align: center; margin-bottom: 32px; }
+  .s1-header { text-align: center; margin-bottom: 28px; }
   .s1-header .emoji { font-size: 48px; margin-bottom: 12px; }
-  .s1-header h1 {
-    color: var(--text); font-size: 26px; font-weight: 800;
-    letter-spacing: 2px; margin-bottom: 6px;
-  }
-  .s1-header p {
-    color: var(--text-muted); font-size: 15px; letter-spacing: 1px;
-  }
+  .s1-header h1 { color: var(--text); font-size: 26px; font-weight: 800; letter-spacing: 2px; margin-bottom: 6px; }
+  .s1-header p { color: var(--text-muted); font-size: 15px; letter-spacing: 1px; }
 
-  .form-group { margin-bottom: 18px; }
-  .form-label {
-    display: block; color: rgba(185,170,145,0.55);
-    font-size: 13px; letter-spacing: 2px; margin-bottom: 6px;
-    text-transform: uppercase;
-  }
+  .form-group { margin-bottom: 16px; }
+  .form-label { display: block; color: rgba(185,170,145,0.55); font-size: 13px; letter-spacing: 2px; margin-bottom: 6px; text-transform: uppercase; }
   .form-input, .form-select {
     width: 100%; padding: 14px 16px;
     background: var(--surface);
@@ -73,10 +62,8 @@
     font-family: inherit;
     -webkit-appearance: none;
   }
-  .form-input:focus, .form-select:focus {
-    border-color: var(--gold-dim);
-  }
-  .form-row { display: flex; gap: 12px; }
+  .form-input:focus, .form-select:focus { border-color: var(--gold-dim); }
+  .form-row { display: flex; gap: 10px; }
   .form-row > * { flex: 1; }
   .form-select {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%23888'/%3E%3C/svg%3E");
@@ -84,10 +71,7 @@
     padding-right: 36px;
   }
   .form-select option { background: #1a1a1e; color: var(--text); }
-  .form-hint {
-    color: rgba(236,229,213,0.3); font-size: 12px;
-    letter-spacing: 1px; margin-top: 4px;
-  }
+  .form-hint { color: rgba(236,229,213,0.3); font-size: 12px; letter-spacing: 1px; margin-top: 4px; }
 
   .btn {
     width: 100%; padding: 16px;
@@ -104,49 +88,66 @@
   .btn-primary:active { transform: scale(0.98); opacity: 0.8; }
   .btn-primary:disabled { opacity: 0.4; pointer-events: none; }
 
-  .privacy-note {
-    text-align: center; margin-top: 24px;
-    color: rgba(236,229,213,0.15); font-size: 12px; letter-spacing: 1px; line-height: 1.6;
-  }
+  .privacy-note { text-align: center; margin-top: 20px; color: rgba(236,229,213,0.15); font-size: 12px; letter-spacing: 1px; line-height: 1.6; }
 
   /* ── Screen 2: Portrait ── */
-  .s2-header { text-align: center; margin-bottom: 24px; }
-  .s2-header h2 {
-    color: var(--text); font-size: 24px; font-weight: 800; letter-spacing: 2px; margin-bottom: 6px;
+  .s2-header { text-align: center; margin-bottom: 20px; }
+  .s2-header h2 { color: var(--text); font-size: 24px; font-weight: 800; letter-spacing: 2px; margin-bottom: 6px; }
+  .s2-header .sub { color: var(--text-muted); font-size: 14px; letter-spacing: 1px; }
+
+  .tagline-box {
+    background: linear-gradient(135deg, rgba(200,180,155,0.08) 0%, rgba(200,180,155,0.02) 100%);
+    border: 1px solid rgba(200,180,155,0.15);
+    border-radius: 14px; padding: 18px 20px; margin-bottom: 16px; text-align: center;
   }
-  .s2-header .sub {
-    color: var(--text-muted); font-size: 14px; letter-spacing: 1px;
+  .tagline-box .tagline {
+    color: var(--gold); font-size: 18px; font-weight: 700; letter-spacing: 2px; line-height: 1.6;
+  }
+  .tagline-box .tagline-sub {
+    color: var(--text-muted); font-size: 13px; letter-spacing: 1px; margin-top: 4px;
   }
 
-  .portrait-cards { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+  /* Toggle */
+  .toggle-row {
+    display: flex; align-items: center; justify-content: center;
+    gap: 12px; margin-bottom: 18px;
+  }
+  .toggle-label { color: var(--text-muted); font-size: 13px; letter-spacing: 1px; }
+  .toggle-label.active { color: var(--gold); }
+  .toggle-switch {
+    width: 48px; height: 26px; border-radius: 13px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    position: relative; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .toggle-switch.on { background: rgba(200,180,155,0.15); border-color: rgba(200,180,155,0.25); }
+  .toggle-switch::after {
+    content: ''; position: absolute; top: 3px; left: 3px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--text-muted); transition: all 0.2s;
+  }
+  .toggle-switch.on::after { left: 25px; background: var(--gold); }
 
+  /* Cards */
+  .portrait-cards { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
   .pcard {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 16px; padding: 20px;
+    border-radius: 16px; padding: 18px;
   }
   .pcard-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
   .pcard-icon {
-    width: 40px; height: 40px; border-radius: 50%;
+    width: 36px; height: 36px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-    border: 1px solid;
+    font-size: 16px; border: 1px solid;
   }
   .pcard:nth-child(1) .pcard-icon { background: rgba(170,140,190,0.12); color: var(--accent-1); border-color: rgba(176,142,192,0.2); }
   .pcard:nth-child(2) .pcard-icon { background: rgba(195,155,115,0.12); color: var(--accent-2); border-color: rgba(195,155,115,0.2); }
   .pcard:nth-child(3) .pcard-icon { background: rgba(120,150,190,0.12); color: var(--accent-3); border-color: rgba(125,150,190,0.2); }
-  .pcard-title { color: var(--text); font-size: 17px; font-weight: 700; letter-spacing: 2px; }
+  .pcard-title { color: var(--text); font-size: 16px; font-weight: 700; letter-spacing: 2px; }
   .pcard-content { color: var(--text-muted); font-size: 14px; letter-spacing: 1px; line-height: 1.7; }
   .pcard-content span { color: var(--gold); }
-
-  .portrait-summary {
-    background: linear-gradient(135deg, rgba(200,180,155,0.06) 0%, rgba(200,180,155,0.01) 100%);
-    border: 1px solid rgba(200,180,155,0.1);
-    border-radius: 14px; padding: 18px 20px; margin-bottom: 24px;
-  }
-  .portrait-summary p {
-    color: var(--text-muted); font-size: 15px; letter-spacing: 2px; line-height: 1.8;
-  }
 
   .btn-secondary {
     background: rgba(255,255,255,0.02);
@@ -158,7 +159,7 @@
   .btn-back {
     background: none; border: none; color: var(--text-muted);
     font-size: 14px; letter-spacing: 2px; text-align: center;
-    margin-top: 16px; cursor: pointer; display: block; width: 100%;
+    margin-top: 14px; cursor: pointer; display: block; width: 100%;
     font-family: inherit;
   }
 
@@ -174,20 +175,19 @@
     border-radius: 20px; padding: 4px 12px;
     color: var(--gold); font-size: 11px; letter-spacing: 1px;
   }
-
-  .quick-questions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .quick-questions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
   .quick-btn {
     background: rgba(255,255,255,0.03);
     border: 1px solid var(--border);
-    border-radius: 20px; padding: 8px 16px;
-    color: var(--text-muted); font-size: 13px; letter-spacing: 1px;
+    border-radius: 20px; padding: 8px 14px;
+    color: var(--text-muted); font-size: 12px; letter-spacing: 1px;
     cursor: pointer; white-space: nowrap; transition: all 0.2s;
     font-family: inherit;
   }
   .quick-btn:active { background: rgba(200,180,155,0.08); border-color: var(--gold-dim); color: var(--gold); }
 
   .chat-messages {
-    flex: 1; overflow-y: auto; padding-bottom: 16px;
+    flex: 1; overflow-y: auto; padding-bottom: 14px;
     display: flex; flex-direction: column; gap: 14px;
     max-height: calc(100vh - 340px);
   }
@@ -195,8 +195,7 @@
   .msg.user { justify-content: flex-end; }
   .msg-avatar {
     width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px;
+    display: flex; align-items: center; justify-content: center; font-size: 14px;
   }
   .msg.assistant .msg-avatar { background: rgba(170,140,190,0.12); color: var(--accent-1); }
   .msg.user .msg-avatar { background: rgba(200,180,155,0.1); color: var(--gold); order: 1; }
@@ -204,33 +203,20 @@
     max-width: 80%; padding: 12px 16px;
     border-radius: 14px; font-size: 14px; letter-spacing: 1px; line-height: 1.7;
   }
-  .msg.assistant .msg-bubble {
-    background: var(--surface); border: 1px solid var(--border);
-    color: var(--text);
-    border-top-left-radius: 4px;
-  }
-  .msg.user .msg-bubble {
-    background: rgba(200,180,155,0.1);
-    border: 1px solid rgba(200,180,155,0.15);
-    color: var(--text);
-    border-top-right-radius: 4px;
-  }
+  .msg.assistant .msg-bubble { background: var(--surface); border: 1px solid var(--border); color: var(--text); border-top-left-radius: 4px; }
+  .msg.user .msg-bubble { background: rgba(200,180,155,0.1); border: 1px solid rgba(200,180,155,0.15); color: var(--text); border-top-right-radius: 4px; }
   .msg.typing .msg-bubble { color: var(--text-muted); }
 
   .chat-input-area {
     display: flex; gap: 10px; padding-top: 14px;
     border-top: 1px solid var(--border);
-    position: sticky; bottom: 0;
-    background: var(--bg);
+    position: sticky; bottom: 0; background: var(--bg);
   }
   .chat-input {
     flex: 1; padding: 14px 16px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    color: var(--text); font-size: 15px;
-    letter-spacing: 1px; outline: none;
-    font-family: inherit;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; color: var(--text); font-size: 15px;
+    letter-spacing: 1px; outline: none; font-family: inherit;
   }
   .chat-input:focus { border-color: var(--gold-dim); }
   .chat-send {
@@ -244,32 +230,24 @@
   .chat-send:active { transform: scale(0.95); }
   .chat-send:disabled { opacity: 0.4; }
 
-  /* Spinner */
   .spinner {
     display: inline-block; width: 20px; height: 20px;
     border: 2px solid rgba(200,180,155,0.2);
     border-top-color: var(--gold);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    border-radius: 50%; animation: spin 0.8s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  .loading-state {
-    display: flex; flex-direction: column; align-items: center;
-    justify-content: center; gap: 16px; padding: 60px 20px;
-  }
+  .loading-state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 60px 20px; }
   .loading-state p { color: var(--text-muted); font-size: 15px; letter-spacing: 2px; }
 
-  .error-box {
-    background: rgba(180,100,100,0.1); border: 1px solid rgba(180,100,100,0.3);
-    border-radius: 12px; padding: 16px;
-    color: #c99a95; font-size: 14px; letter-spacing: 1px; line-height: 1.6;
-  }
-
-  /* Scrollbar */
   ::-webkit-scrollbar { width: 3px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+
+  .day-select { max-width: 80px; }
+  .year-select { max-width: 110px; }
+  .month-select { max-width: 90px; }
 </style>
 </head>
 <body>
@@ -285,8 +263,12 @@
     </div>
 
     <div class="form-group">
-      <label class="form-label">出生日期</label>
-      <input type="date" class="form-input" id="birth-date" value="1995-06-15">
+      <label class="form-label">出生日期 (年-月-日)</label>
+      <div class="form-row">
+        <select class="form-select year-select" id="birth-year"></select>
+        <select class="form-select month-select" id="birth-month"></select>
+        <select class="form-select day-select" id="birth-day"></select>
+      </div>
     </div>
 
     <div class="form-group">
@@ -297,25 +279,28 @@
 
     <div class="form-group">
       <label class="form-label">出生地点</label>
-      <select class="form-select" id="birth-city" onchange="updateCoords()">
-        <option value="116.4074,39.9042,8">北京</option>
-        <option value="121.4737,31.2304,8">上海</option>
-        <option value="113.2644,23.1291,8">广州</option>
-        <option value="114.0579,22.5431,8">深圳</option>
-        <option value="104.0657,30.6599,8">成都</option>
-        <option value="120.1551,30.2741,8">杭州</option>
-        <option value="108.9402,34.2611,8">西安</option>
-        <option value="114.2985,30.5843,8">武汉</option>
-        <option value="106.5044,29.5317,8">重庆</option>
-        <option value="118.7781,32.0570,8">南京</option>
-        <option value="117.2008,39.0851,8">天津</option>
-        <option value="126.6424,45.7567,8">哈尔滨</option>
-        <option value="117.0249,36.6758,8">济南</option>
-        <option value="112.5534,37.8706,8">太原</option>
-        <option value="91.1320,29.6593,6">拉萨</option>
-        <option value="87.6168,43.7930,6">乌鲁木齐</option>
-        <option value="121.5497,25.0383,8" selected>台北</option>
+      <select class="form-select" id="country" onchange="onCountryChange()">
+        <option value="中国" selected>中国</option>
+        <option value="美国">美国</option>
+        <option value="日本">日本</option>
+        <option value="韩国">韩国</option>
+        <option value="英国">英国</option>
+        <option value="法国">法国</option>
+        <option value="德国">德国</option>
+        <option value="加拿大">加拿大</option>
+        <option value="澳大利亚">澳大利亚</option>
+        <option value="新加坡">新加坡</option>
       </select>
+    </div>
+
+    <div class="form-group" id="province-group">
+      <label class="form-label">省份</label>
+      <select class="form-select" id="province" onchange="onProvinceChange()"></select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">城市</label>
+      <select class="form-select" id="city"></select>
     </div>
 
     <div class="form-group">
@@ -329,7 +314,7 @@
     <button class="btn btn-primary" id="btn-generate" onclick="generateChart()">
       ✦ 生成我的画像
     </button>
-    <p class="privacy-note">数据仅用于本次计算，不会上传至任何服务器<br>（除计算所需的必要传输外）</p>
+    <p class="privacy-note">数据仅用于本次计算，不会上传至任何服务器</p>
   </div>
 
   <!-- ═══ Screen 2: Portrait ═══ -->
@@ -361,8 +346,7 @@
       <div class="msg assistant">
         <div class="msg-avatar">✦</div>
         <div class="msg-bubble">
-          我已经根据你的信息完成了综合分析。你可以直接问我问题，也可以点击上面的快捷问题开始。<br><br>
-          <span style="color:rgba(236,229,213,0.6);font-size:13px;">（根据你的计算结果，随时可以纠正与我感受不符的地方）</span>
+          我已根据你的信息完成了综合分析。你可以直接问我问题，也可以点击上面的快捷问题开始。
         </div>
       </div>
     </div>
@@ -375,10 +359,241 @@
 </div>
 
 <script>
-// ─── State ──
+// ─── City Database ───
+const CITY_DATA = {
+  '中国': {
+    tz: 8,
+    provinces: {
+      '北京': { cities: { '北京': [116.4074,39.9042] } },
+      '上海': { cities: { '上海': [121.4737,31.2304] } },
+      '天津': { cities: { '天津': [117.2008,39.0851] } },
+      '重庆': { cities: { '重庆': [106.5044,29.5317] } },
+      '广东': { cities: {
+        '广州': [113.2644,23.1291], '深圳': [114.0579,22.5431],
+        '东莞': [113.7517,23.0205], '佛山': [113.1214,23.0218],
+        '珠海': [113.5767,22.2707], '惠州': [114.4156,23.1118],
+        '中山': [113.3823,22.5159], '汕头': [116.6821,23.3535]
+      }},
+      '浙江': { cities: {
+        '杭州': [120.1551,30.2741], '宁波': [121.5497,29.8683],
+        '温州': [120.6993,27.9939], '嘉兴': [120.7556,30.7465],
+        '绍兴': [120.5802,30.0303], '金华': [119.6475,29.0791]
+      }},
+      '江苏': { cities: {
+        '南京': [118.7781,32.0570], '苏州': [120.5853,31.2989],
+        '无锡': [120.3119,31.4909], '徐州': [117.1881,34.2047],
+        '常州': [119.9736,31.8108], '南通': [120.8937,31.9799]
+      }},
+      '山东': { cities: {
+        '济南': [117.0249,36.6758], '青岛': [120.3826,36.0671],
+        '烟台': [121.4479,37.4635], '威海': [122.1204,37.5131],
+        '潍坊': [119.1617,36.7068], '临沂': [118.3564,35.1046]
+      }},
+      '四川': { cities: {
+        '成都': [104.0657,30.6599], '绵阳': [104.6791,31.4675],
+        '宜宾': [104.6433,28.7512], '德阳': [104.3979,31.1267],
+        '乐山': [103.7655,29.5521], '南充': [106.1107,30.8378]
+      }},
+      '湖北': { cities: {
+        '武汉': [114.2985,30.5843], '宜昌': [111.2864,30.6918],
+        '襄阳': [112.1224,32.0090], '荆州': [112.2397,30.3352]
+      }},
+      '湖南': { cities: {
+        '长沙': [112.9388,28.2279], '岳阳': [113.1289,29.3571],
+        '株洲': [113.1338,27.8276], '衡阳': [112.5719,26.8932],
+        '张家界': [110.4789,29.1167]
+      }},
+      '河南': { cities: {
+        '郑州': [113.6253,34.7466], '洛阳': [112.4539,34.6182],
+        '开封': [114.3076,34.7972], '南阳': [112.5283,32.9907]
+      }},
+      '河北': { cities: {
+        '石家庄': [114.5148,38.0423], '唐山': [118.1801,39.6305],
+        '保定': [115.4652,38.8738], '邯郸': [114.5391,36.6255],
+        '廊坊': [116.6837,39.3766]
+      }},
+      '陕西': { cities: {
+        '西安': [108.9402,34.2611], '咸阳': [108.7089,34.3296],
+        '宝鸡': [107.2377,34.3619], '延安': [109.4897,36.5853]
+      }},
+      '山西': { cities: {
+        '太原': [112.5534,37.8706], '大同': [113.3001,40.0762],
+        '临汾': [111.5190,36.0880], '运城': [111.0069,35.0265]
+      }},
+      '辽宁': { cities: {
+        '沈阳': [123.4315,41.8057], '大连': [121.6147,38.9140],
+        '鞍山': [122.9945,41.1078], '抚顺': [123.9572,41.8808]
+      }},
+      '吉林': { cities: {
+        '长春': [125.3235,43.8169], '吉林': [126.5495,43.8378],
+        '延吉': [129.5089,42.8910]
+      }},
+      '黑龙江': { cities: {
+        '哈尔滨': [126.6424,45.7567], '大庆': [125.1030,46.5876],
+        '齐齐哈尔': [123.9181,47.3543]
+      }},
+      '福建': { cities: {
+        '福州': [119.2965,26.0745], '厦门': [118.0894,24.4798],
+        '泉州': [118.6758,24.8741], '漳州': [117.6475,24.5130]
+      }},
+      '安徽': { cities: {
+        '合肥': [117.2272,31.8205], '芜湖': [118.4329,31.3525],
+        '黄山': [118.3375,29.7147]
+      }},
+      '江西': { cities: {
+        '南昌': [115.8579,28.6820], '九江': [116.0019,29.7050],
+        '景德镇': [117.1784,29.2686], '赣州': [114.9347,25.8310]
+      }},
+      '贵州': { cities: {
+        '贵阳': [106.6301,26.6476], '遵义': [106.9272,27.7256]
+      }},
+      '云南': { cities: {
+        '昆明': [102.8328,24.8799], '大理': [100.2676,25.6065],
+        '丽江': [100.2271,26.8566], '西双版纳': [100.7998,22.0094]
+      }},
+      '甘肃': { cities: {
+        '兰州': [103.8343,36.0610], '敦煌': [94.6619,40.1421],
+        '天水': [105.7249,34.5808]
+      }},
+      '广西': { cities: {
+        '南宁': [108.3661,22.8170], '桂林': [110.2900,25.2736],
+        '柳州': [109.4155,24.3264], '北海': [109.1200,21.4811]
+      }},
+      '海南': { cities: {
+        '海口': [110.1998,20.0199], '三亚': [109.5119,18.2528]
+      }},
+      '内蒙古': { cities: {
+        '呼和浩特': [111.7490,40.8423], '包头': [109.8401,40.6578],
+        '鄂尔多斯': [109.7808,39.6083]
+      }},
+      '新疆': { cities: {
+        '乌鲁木齐': [87.6168,43.7930], '喀什': [75.9897,39.4704]
+      }},
+      '西藏': { cities: {
+        '拉萨': [91.1320,29.6593], '日喀则': [88.8851,29.2669]
+      }},
+      '宁夏': { cities: { '银川': [106.2309,38.4872] } },
+      '青海': { cities: { '西宁': [101.7782,36.6171] } },
+      '香港': { cities: { '香港': [114.1733,22.3193] } },
+      '澳门': { cities: { '澳门': [113.5491,22.1987] } },
+      '台湾': { cities: {
+        '台北': [121.5497,25.0383], '高雄': [120.3016,22.6273],
+        '台中': [120.6798,24.1384], '台南': [120.2190,22.9997]
+      } }
+    }
+  },
+  '美国': { tz: -5, provinces: { '纽约': { cities: { '纽约': [-74.006,40.7128] } }, '加利福尼亚': { cities: { '洛杉矶': [-118.2437,34.0522], '旧金山': [-122.4194,37.7749] } }, '伊利诺伊': { cities: { '芝加哥': [-87.6298,41.8781] } }, '华盛顿': { cities: { '西雅图': [-122.3321,47.6062] } } } },
+  '日本': { tz: 9, provinces: { '东京': { cities: { '东京': [139.6917,35.6895] } }, '大阪': { cities: { '大阪': [135.5023,34.6937] } }, '京都': { cities: { '京都': [135.7681,35.0116] } }, '北海道': { cities: { '札幌': [141.3469,43.0683] } } } },
+  '韩国': { tz: 9, provinces: { '首尔': { cities: { '首尔': [126.9780,37.5665] } }, '釜山': { cities: { '釜山': [129.0756,35.1796] } } } },
+  '英国': { tz: 0, provinces: { '英格兰': { cities: { '伦敦': [-0.1276,51.5074], '曼彻斯特': [-2.2426,53.4808] } } } },
+  '法国': { tz: 1, provinces: { '法兰西岛': { cities: { '巴黎': [2.3522,48.8566] } }, '罗讷': { cities: { '里昂': [4.8357,45.7640] } } } },
+  '德国': { tz: 1, provinces: { '柏林': { cities: { '柏林': [13.4050,52.5200] } }, '巴伐利亚': { cities: { '慕尼黑': [11.5820,48.1351] } } } },
+  '加拿大': { tz: -5, provinces: { '安大略': { cities: { '多伦多': [-79.3832,43.6532] } }, '不列颠哥伦比亚': { cities: { '温哥华': [-123.1207,49.2827] } } } },
+  '澳大利亚': { tz: 10, provinces: { '新南威尔士': { cities: { '悉尼': [151.2093,-33.8688] } }, '维多利亚': { cities: { '墨尔本': [144.9631,-37.8136] } } } },
+  '新加坡': { tz: 8, provinces: { '新加坡': { cities: { '新加坡': [103.8198,1.3521] } } } }
+};
+
+// ─── Init ───
+function initDateSelects() {
+  const ySel = document.getElementById('birth-year');
+  const mSel = document.getElementById('birth-month');
+  const dSel = document.getElementById('birth-day');
+
+  for (let y = 2026; y >= 1950; y--) {
+    const opt = document.createElement('option');
+    opt.value = y; opt.textContent = y + '年';
+    if (y === 1995) opt.selected = true;
+    ySel.appendChild(opt);
+  }
+
+  for (let m = 1; m <= 12; m++) {
+    const opt = document.createElement('option');
+    opt.value = m; opt.textContent = m + '月';
+    if (m === 6) opt.selected = true;
+    mSel.appendChild(opt);
+  }
+
+  function updateDays() {
+    const y = parseInt(ySel.value);
+    const m = parseInt(mSel.value);
+    const daysInMonth = new Date(y, m, 0).getDate();
+    const cur = parseInt(dSel.value) || 15;
+    dSel.innerHTML = '';
+    for (let d = 1; d <= daysInMonth; d++) {
+      const opt = document.createElement('option');
+      opt.value = d; opt.textContent = d + '日';
+      if (d === Math.min(cur, daysInMonth)) opt.selected = true;
+      dSel.appendChild(opt);
+    }
+  }
+
+  ySel.addEventListener('change', updateDays);
+  mSel.addEventListener('change', updateDays);
+  updateDays();
+}
+
+function initLocation() {
+  onCountryChange();
+}
+
+function onCountryChange() {
+  const country = document.getElementById('country').value;
+  const provGroup = document.getElementById('province-group');
+  const provSel = document.getElementById('province');
+  const citySel = document.getElementById('city');
+  const data = CITY_DATA[country];
+
+  provSel.innerHTML = '';
+  citySel.innerHTML = '';
+
+  if (!data) return;
+
+  const provinces = Object.keys(data.provinces);
+  if (provinces.length <= 1 && Object.keys(data.provinces[provinces[0]].cities).length <= 1) {
+    provGroup.style.display = 'none';
+    const city = Object.keys(data.provinces[provinces[0]].cities)[0];
+    citySel.innerHTML = `<option value="${city}">${city}</option>`;
+  } else {
+    provGroup.style.display = 'block';
+    for (const p of provinces) {
+      provSel.innerHTML += `<option value="${p}">${p}</option>`;
+    }
+    onProvinceChange();
+  }
+}
+
+function onProvinceChange() {
+  const country = document.getElementById('country').value;
+  const province = document.getElementById('province').value;
+  const citySel = document.getElementById('city');
+  const data = CITY_DATA[country];
+  if (!data) return;
+
+  const cities = data.provinces[province]?.cities || {};
+  citySel.innerHTML = '';
+  for (const [name, coords] of Object.entries(cities)) {
+    citySel.innerHTML += `<option value="${coords[0]},${coords[1]}">${name}</option>`;
+  }
+}
+
+function getCoords() {
+  const country = document.getElementById('country').value;
+  const data = CITY_DATA[country];
+  const tz = data?.tz || 8;
+
+  const cityVal = document.getElementById('city').value;
+  if (cityVal.includes(',')) {
+    const [lon, lat] = cityVal.split(',').map(parseFloat);
+    return { lon, lat, tz };
+  }
+  return { lon: 116.4074, lat: 39.9042, tz: 8 };
+}
+
+// ─── State & Navigation ───
 let chartData = null;
 let sessionId = generateUUID();
 let chatHistory = [];
+let detailMode = false;
 
 function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
@@ -387,16 +602,10 @@ function generateUUID() {
   });
 }
 
-// ─── Screen Navigation ──
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   if (id === 'screen-chat') scrollChatBottom();
-}
-
-// ─── City Coordinates ──
-function updateCoords() {
-  // handled via value attribute on change
 }
 
 // ─── Chart Generation ──
@@ -405,18 +614,20 @@ async function generateChart() {
   btn.disabled = true;
   btn.textContent = '计算中...';
 
-  const cityVal = document.getElementById('birth-city').value.split(',');
-  const lon = parseFloat(cityVal[0]);
-  const lat = parseFloat(cityVal[1]);
-  const tz = parseInt(cityVal[2]) || 8;
+  const y = parseInt(document.getElementById('birth-year').value);
+  const m = parseInt(document.getElementById('birth-month').value);
+  const d = parseInt(document.getElementById('birth-day').value);
+  const birthDate = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+
+  const coords = getCoords();
 
   const payload = {
-    birth_date: document.getElementById('birth-date').value,
+    birth_date: birthDate,
     birth_time: document.getElementById('birth-time').value,
-    longitude: lon,
-    latitude: lat,
+    longitude: coords.lon,
+    latitude: coords.lat,
     gender: document.getElementById('gender').value,
-    timezone_offset: tz,
+    timezone_offset: coords.tz,
   };
 
   try {
@@ -432,6 +643,7 @@ async function generateChart() {
     }
 
     chartData = await resp.json();
+    detailMode = false;
     showScreen('screen-portrait');
     renderPortrait(chartData);
   } catch (e) {
@@ -446,75 +658,101 @@ function renderPortrait(data) {
   const chart = data.chart || {};
   const bazi = data.bazi || {};
   const star = data.star_mansion || {};
-
   const planets = chart.planets || [];
   const sun = planets.find(p => p.name_en === 'Sun') || {};
   const moon = planets.find(p => p.name_en === 'Moon') || {};
   const asc = chart.ascendant || {};
-
+  const mc = chart.midheaven || {};
   const pillars = bazi.pillars || [];
+  const tagline = chart.portrait_tagline || '';
+
+  document.getElementById('portrait-date').textContent =
+    document.getElementById('birth-year').value + '-' +
+    document.getElementById('birth-month').value + '-' +
+    document.getElementById('birth-day').value + ' · ' +
+    document.getElementById('birth-time').value;
 
   let html = '';
 
-  // Card 1: 星盘
-  html += `<div class="pcard">
-    <div class="pcard-head">
-      <div class="pcard-icon">✨</div>
-      <div class="pcard-title">星盘 · 性格天赋</div>
-    </div>
-    <div class="pcard-content">
-      太阳 <span>${sun.sign || '-'} ${sun.degree_in_sign || ''}°</span> ·
-      月亮 <span>${moon.sign || '-'} ${moon.degree_in_sign || ''}°</span> ·
-      上升 <span>${asc.sign || '-'} ${asc.degree || ''}°</span><br>
-      主导元素：<span>${chart.dominant_element || '-'}</span>
-      （🔥${(chart.element_distribution||{}).火||0} ⛰${(chart.element_distribution||{}).土||0} 🌪${(chart.element_distribution||{}).风||0} 💧${(chart.element_distribution||{}).水||0}）
-    </div>
+  // Tagline
+  html += `<div class="tagline-box">
+    <div class="tagline">${tagline || '正在生成画像...'}</div>
+    <div class="tagline-sub">基于星盘·八字·星宿的综合画像</div>
   </div>`;
 
-  // Card 2: 八字
-  html += `<div class="pcard">
-    <div class="pcard-head">
-      <div class="pcard-icon">🔮</div>
-      <div class="pcard-title">八字 · 核心特质</div>
-    </div>
-    <div class="pcard-content">
-      日主：<span>${bazi.day_master || '-'}</span>（${bazi.day_master_element || '-'}·${bazi.day_master_yin_yang || '-'}）<br>`;
+  // Toggle
+  html += `<div class="toggle-row">
+    <span class="toggle-label ${detailMode ? '' : 'active'}">精简</span>
+    <div class="toggle-switch ${detailMode ? 'on' : ''}" onclick="toggleDetail()"></div>
+    <span class="toggle-label ${detailMode ? 'active' : ''}">详细</span>
+  </div>`;
 
-  if (pillars.length >= 4) {
-    html += `四柱：<span>${pillars[0].stem}${pillars[0].branch}</span> ·
-      <span>${pillars[1].stem}${pillars[1].branch}</span> ·
-      <span>${pillars[2].stem}${pillars[2].branch}</span> ·
-      <span>${pillars[3].stem}${pillars[3].branch}</span><br>`;
+  if (detailMode) {
+    // Detailed cards
+    html += `<div class="portrait-cards">`;
+
+    html += `<div class="pcard">
+      <div class="pcard-head"><div class="pcard-icon">✨</div><div class="pcard-title">星盘</div></div>
+      <div class="pcard-content">
+        太阳 <span>${sun.sign||'-'} ${sun.degree_in_sign||''}°</span> ·
+        月亮 <span>${moon.sign||'-'} ${moon.degree_in_sign||''}°</span><br>
+        上升 <span>${asc.sign||'-'} ${asc.degree||''}°</span> ·
+        天顶 <span>${mc.sign||'-'} ${mc.degree||''}°</span><br>
+        元素：<span>${chart.dominant_element||'-'}</span>（火${(chart.element_distribution||{}).火||0} 土${(chart.element_distribution||{}).土||0} 风${(chart.element_distribution||{}).风||0} 水${(chart.element_distribution||{}).水||0}）<br>`;
+
+    // Planets
+    const orderedPlanets = ['太阳','月球','水星','金星','火星','木星','土星','天王星','海王星','冥王星'];
+    for (const name of orderedPlanets) {
+      const p = planets.find(x => x.name_cn === name);
+      if (p) {
+        html += `${p.symbol}${p.name_cn} <span>${p.sign}${p.degree_in_sign}°</span>${p.retrograde?' ℞':''} · `;
+      }
+    }
+    html += `<br>相位：${(chart.aspects||[]).slice(0,4).map(a => a.planet1+' '+a.aspect+' '+a.planet2).join(' · ') || '无主要相位'}</div></div>`;
+
+    html += `<div class="pcard">
+      <div class="pcard-head"><div class="pcard-icon">🔮</div><div class="pcard-title">八字</div></div>
+      <div class="pcard-content">
+        日主：<span>${bazi.day_master||'-'}（${bazi.day_master_element||'-'}·${bazi.day_master_yin_yang||'-'}）</span><br>`;
+    if (pillars.length >= 4) {
+      html += `四柱：<span>${pillars[0].stem}${pillars[0].branch}</span> · <span>${pillars[1].stem}${pillars[1].branch}</span> · <span>${pillars[2].stem}${pillars[2].branch}</span> · <span>${pillars[3].stem}${pillars[3].branch}</span><br>`;
+      html += `纳音：${(bazi.nayin||[]).join(' · ')}<br>`;
+    }
+    html += `十神：${Object.entries(bazi.ten_gods||{}).map(([k,v]) => k+':'+v).join(' ')}<br>`;
+    html += `日主：<span>${bazi.day_master_strength||'-'}</span> · 生肖：<span>${bazi.zodiac||'-'}</span> · 起运：<span>${bazi.luck_direction||'-'}</span></div></div>`;
+
+    html += `<div class="pcard">
+      <div class="pcard-head"><div class="pcard-icon">🌙</div><div class="pcard-title">星宿</div></div>
+      <div class="pcard-content">
+        <span>${star.name||'-'}（${star.element||'-'}·${star.direction||'-'}方·${star.animal||'-'}）</span><br>
+        ${star.personality||'-'}<br>农历：${data.lunar_date||'-'}</div></div>`;
+
+    html += `</div>`;
+  } else {
+    // Simplified
+    html += `<div class="portrait-cards">`;
+    html += `<div class="pcard">
+      <div class="pcard-head"><div class="pcard-icon">✨</div><div class="pcard-title">核心配置</div></div>
+      <div class="pcard-content">
+        太阳 <span>${sun.sign||'-'} ${sun.degree_in_sign||''}°</span> ·
+        月亮 <span>${moon.sign||'-'} ${moon.degree_in_sign||''}°</span> ·
+        上升 <span>${asc.sign||'-'} ${asc.degree||''}°</span><br>
+        日主 <span>${bazi.day_master||'-'}${bazi.day_master_element||''}</span> ·
+        星宿 <span>${star.name||'-'}</span> ·
+        生肖 <span>${bazi.zodiac||'-'}</span>
+      </div></div>`;
+    html += `</div>`;
   }
-
-  html += `日主强弱：<span>${bazi.day_master_strength || '-'}</span> · 生肖：<span>${bazi.zodiac || '-'}</span>
-    </div>
-  </div>`;
-
-  // Card 3: 星宿
-  html += `<div class="pcard">
-    <div class="pcard-head">
-      <div class="pcard-icon">🌙</div>
-      <div class="pcard-title">星宿 · 性格类型</div>
-    </div>
-    <div class="pcard-content">
-      <span>${star.name || '-'}（${star.element || '-'}·${star.direction || '-'}方·${star.animal || '-'}）</span><br>
-      ${star.personality || '-'}<br>
-      农历日期：<span>${data.lunar_date || '-'}</span>
-    </div>
-  </div>`;
-
-  // Summary
-  html += `<div class="portrait-summary">
-    <p>你的核心特质：<span>太阳${sun.sign||'-'}</span> + <span>月亮${moon.sign||'-'}</span> + <span>上升${asc.sign||'-'}</span> 的组合，配合八字日主 <span>${bazi.day_master||'-'}（${bazi.day_master_element||'-'}）</span> 的特质，以及星宿 <span>${star.name||'-'}</span> 的性格底色。三者交汇构成了你独特的生命底色。</p>
-  </div>`;
 
   html += `<button class="btn btn-primary" onclick="startChat()">✦ 开始 AI 深度分析</button>`;
   html += `<button class="btn-back" onclick="showScreen('screen-input')">← 返回修改信息</button>`;
 
   document.getElementById('portrait-content').innerHTML = html;
-  document.getElementById('portrait-date').textContent =
-    document.getElementById('birth-date').value + ' · ' + document.getElementById('birth-time').value;
+}
+
+function toggleDetail() {
+  detailMode = !detailMode;
+  renderPortrait(chartData);
 }
 
 // ─── Chat ──
@@ -526,14 +764,11 @@ async function sendMessage(msg) {
   const input = document.getElementById('chat-input');
   const message = msg || input.value.trim();
   if (!message || !chartData) return;
-
   if (!msg) input.value = '';
 
-  // Add user message
   addMessage('user', message);
   chatHistory.push({ role: 'user', content: message });
 
-  // Add typing indicator
   const typingId = addTypingIndicator();
 
   try {
@@ -553,7 +788,6 @@ async function sendMessage(msg) {
       throw new Error(err.error || `请求失败 (${resp.status})`);
     }
 
-    // Read SSE stream
     removeTypingIndicator(typingId);
     const assistantId = addMessage('assistant', '');
     const bubble = document.querySelector(`[data-msg-id="${assistantId}"] .msg-bubble`);
@@ -566,16 +800,13 @@ async function sendMessage(msg) {
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-
       buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split('\n');
       buffer = lines.pop() || '';
-
       for (const line of lines) {
         if (!line.startsWith('data: ')) continue;
         const data = line.slice(6);
         if (data === '[DONE]') break;
-
         try {
           const parsed = JSON.parse(data);
           const delta = parsed.choices?.[0]?.delta?.content;
@@ -584,23 +815,19 @@ async function sendMessage(msg) {
             bubble.innerHTML = formatMarkdown(fullContent);
             scrollChatBottom();
           }
-        } catch (e) {
-          // Skip unparseable chunks
-        }
+        } catch (e) {}
       }
     }
 
-    // Finalize
     if (fullContent) {
       chatHistory.push({ role: 'assistant', content: fullContent });
     } else {
-      // Fallback: try non-stream
       removeMessage(assistantId);
       await fallbackNonStream(message);
     }
   } catch (e) {
     removeTypingIndicator(typingId);
-    addMessage('assistant', '抱歉，出了点问题：' + e.message + '\n\n请稍后重试或刷新页面。');
+    addMessage('assistant', '出了点问题：' + e.message + '\n请稍后重试。');
   }
 }
 
@@ -642,9 +869,7 @@ function addMessage(role, content) {
   const div = document.createElement('div');
   div.className = `msg ${role}`;
   div.setAttribute('data-msg-id', id);
-  div.innerHTML = `
-    <div class="msg-avatar">${role === 'user' ? '我' : '✦'}</div>
-    <div class="msg-bubble">${formatMarkdown(content)}</div>`;
+  div.innerHTML = `<div class="msg-avatar">${role === 'user' ? '我' : '✦'}</div><div class="msg-bubble">${formatMarkdown(content)}</div>`;
   container.appendChild(div);
   scrollChatBottom();
   return id;
@@ -656,31 +881,22 @@ function addTypingIndicator() {
   const div = document.createElement('div');
   div.className = 'msg assistant typing';
   div.setAttribute('data-msg-id', id);
-  div.innerHTML = `
-    <div class="msg-avatar">✦</div>
-    <div class="msg-bubble"><span class="spinner"></span> 思考中...</div>`;
+  div.innerHTML = `<div class="msg-avatar">✦</div><div class="msg-bubble"><span class="spinner"></span> 思考中...</div>`;
   container.appendChild(div);
   scrollChatBottom();
   return id;
 }
 
-function removeTypingIndicator(id) {
-  removeMessage(id);
-}
-
+function removeTypingIndicator(id) { removeMessage(id); }
 function removeMessage(id) {
   const el = document.querySelector(`[data-msg-id="${id}"]`);
   if (el) el.remove();
 }
-
 function scrollChatBottom() {
   const container = document.getElementById('chat-messages');
-  if (container) {
-    setTimeout(() => { container.scrollTop = container.scrollHeight; }, 50);
-  }
+  if (container) setTimeout(() => { container.scrollTop = container.scrollHeight; }, 50);
 }
 
-// ─── Simple Markdown ──
 function formatMarkdown(text) {
   if (!text) return '';
   return text
@@ -689,6 +905,10 @@ function formatMarkdown(text) {
     .replace(/## (.+)/g, '<br><strong style="font-size:16px">$1</strong><br>')
     .replace(/\n/g, '<br>');
 }
+
+// ─── Bootstrap ──
+initDateSelects();
+initLocation();
 </script>
 </body>
 </html>
