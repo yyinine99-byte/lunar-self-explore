@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>AI 自我探索 — 性格分析与自我认知工具</title>
-<meta name="description" content="本工具为性格分析/自我探索用途，仅供娱乐参考，非算命、非预测、非决策依据。基于出生信息的星盘与五行能量画像。">
+<meta name="description" content="仅供娱乐参考，理性看待。基于出生信息的星盘与五行能量画像。">
 <style>
   :root {
     --bg: #0d0d13;
@@ -316,7 +316,7 @@
       <div class="emoji">🔍</div>
       <h1>开始自我探索</h1>
       <p>输入你的信息，获取性格分析综合画像</p>
-      <p style="font-size:11px;color:var(--text-muted);margin-top:6px;">仅供娱乐参考，非算命、非预测、非决策依据</p>
+      <p style="font-size:11px;color:var(--text-muted);margin-top:6px;">仅供娱乐参考，理性看待</p>
     </div>
 
     <div class="form-group">
@@ -356,7 +356,7 @@
     <button class="btn btn-primary" id="btn-generate" onclick="generateChart()">
       ✦ 生成我的画像
     </button>
-    <p class="privacy-note">本工具为性格分析/自我探索用途，仅供娱乐参考。数据仅用于本次计算，不会上传至任何服务器。</p>
+    <p class="privacy-note">仅供娱乐参考，理性看待。数据仅用于本次计算，不会上传至任何服务器。</p>
   </div>
 
   <!-- ═══ Screen 2: Portrait ═══ -->
@@ -1227,7 +1227,7 @@ function renderPortrait(data) {
         <div class="suggest-num">2</div>
         <div>看清关系模式 — 你会发现重复的互动模式背后有规律</div>
       </div>
-      <div class="suggest-item" onclick="startChat();setTimeout(()=>sendQuick('我当前阶段更偏好稳定探索还是冒险突破？'),300)">
+      <div class="suggest-item" onclick="startChat();setTimeout(()=>sendQuick('我更适合稳定积累还是冒险突破？'),300)">
         <div class="suggest-num">3</div>
         <div>找到方向 — 基于${dayMaster ? '日主'+dayMaster+'的特质' : '你的配置'}，找到最适合的发力点</div>
       </div>
@@ -1300,24 +1300,24 @@ function startChat() {
 // Tab questions
 const TAB_QUESTIONS = {
   talent: [
-    '我在工作中更偏向稳健执行还是自主探索？',
-    '我在团队协作和独立作战中哪个状态更好？',
-    '我性格中最大的隐藏优势是什么？',
-    '哪些能力倾向是我自己没意识到的？',
-    '我的创造力和专注力哪个更突出？',
+    '我最大的天赋盲区是什么？',
+    '我更适合打工还是创业？',
+    '我在团队中适合做领导者还是执行者？',
+    '我学东西慢，是不适合这个领域吗？',
+    '我的创造力在哪些方面最突出？',
   ],
   relation: [
-    '我和亲近的人相处时，哪些沟通方式更适合我？',
-    '我在工作环境中的人际互动有什么特点？',
-    '我在亲密关系中容易产生什么误解和摩擦？',
-    '从我的性格看，什么样的相处模式更适合我？',
+    '什么样的人更适合做我的伴侣？',
+    '为什么我在关系中总重复同样的矛盾？',
+    '我和家人的相处模式有什么特点？',
+    '我在亲密关系中最需要注意什么？',
     '我在人际关系中容易踩什么坑？',
   ],
   direction: [
-    '以我的性格倾向，哪些行业和岗位更适合发挥优势？',
-    '当前阶段我可以在哪个方向投入精力？',
-    '面对瓶颈期，我的性格特质能帮到我什么？',
-    '从自我成长角度看，我接下来可以关注哪些方面？',
+    '以我的特质，适合什么职业方向？',
+    '我该留在现在的行业还是换赛道？',
+    '面对瓶颈期，我的性格能帮到我什么？',
+    '我当前阶段最应该聚焦哪个方向？',
     '什么样的工作节奏和我的内在节奏更合拍？',
   ]
 };
