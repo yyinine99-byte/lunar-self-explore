@@ -19,7 +19,7 @@ import os
 
 from chart_calculator import compute_chart
 from bazi_calculator import compute_bazi
-from star_database import get_mansion_by_lunar_date
+from star_database import get_mansion_by_lunar_date, get_mansion_by_moon_longitude
 from lunar_calendar import solar_to_lunar
 from ai_service import chat_stream, chat_non_stream
 from rate_limiter import chat_limiter, chart_limiter
@@ -101,12 +101,20 @@ async def api_chart(request: Request, body: ChartRequest):
             gender=body.gender,
         )
 
-        # 3. 计算农历日期 → 星宿
+        # 3. 计算农历日期 → 星宿（农历月法）
         lunar = solar_to_lunar(birth_date)
         star_result = get_mansion_by_lunar_date(
             lunar_month=lunar["month"],
             lunar_day=lunar["day"],
         )
+
+        # 3b. 用月亮实际黄经做天文校验
+        moon_planet = next((p for p in chart_result["planets"] if p["name_en"] == "Moon"), None)
+        if moon_planet:
+            moon_lon = moon_planet["ecliptic_longitude"]
+            star_result_astro = get_mansion_by_moon_longitude(moon_lon)
+            # 将天文校验结果附带到返回中
+            star_result["moon_lon_mansion"] = star_result_astro["name"]
 
         # 4. 组装响应
         combined = {

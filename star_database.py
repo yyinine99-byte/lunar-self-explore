@@ -1,7 +1,7 @@
-"""二十八宿数据表 - 基于农历日期查表。
+"""二十八宿数据表 — 基于农历月日 + 月亮黄经双校验。
 
-二十八宿按农历每月循环排列。
-每一宿有其五行属性、象征含义和性格关键词。
+二十八宿按农历每月有固定起始宿，月内按日递推。
+同时用月亮实际黄经做天文校验。
 """
 
 # 二十八宿名称（按顺序）
@@ -44,38 +44,38 @@ MANSION_DATA = {
     "轸宿": {"element": "水", "animal": "蚓", "direction": "南", "personality": "灵活多变，适应性强，善于沟通"},
 }
 
-# 农历每日对应星宿的起始索引
-# 农历正月初一对应一个固定的星宿（按传统为"虚宿"，索引13）
-# 然后按28天循环
-_LUNAR_NEW_YEAR_BASE = 13  # 正月初一 = 虚宿 (index 13 in MANSION_NAMES)
+# 每个农历月的起始星宿索引（正月到十二月）
+# 正月: 室宿(12), 二月: 奎宿(14), 三月: 胃宿(16), 四月: 毕宿(18)
+# 五月: 参宿(20), 六月: 鬼宿(21), 七月: 张宿(24), 八月: 角宿(0)
+# 九月: 氐宿(2), 十月: 心宿(4), 十一月: 斗宿(7), 十二月: 虚宿(10)
+# 验证：1995年正月初十 → (12+10-1)%28=21 → 井宿 ✓
+MONTH_START_MANSION = {
+    1: 12, 2: 14, 3: 16, 4: 18,
+    5: 20, 6: 21, 7: 24, 8: 0,
+    9: 2, 10: 4, 11: 7, 12: 10,
+}
+
+# 二十八宿天文边界 — 基于月亮黄经等分法
+# 角宿起始参考：Spica（角宿一）≈ 203.84° 黄经 (J2000)
+# 使用等分法：每宿 360/28 ≈ 12.857°
+_JIAO_REF = 203.84  # 角宿起始黄经
+_MANSION_WIDTH = 360.0 / 28.0
 
 
-def get_mansion_by_lunar_date(lunar_month: int, lunar_day: int, lunar_year: int = 2024) -> dict:
-    """根据农历月日获取星宿信息。
+def get_mansion_by_moon_longitude(moon_ecliptic_lon: float) -> dict:
+    """根据月亮实际黄经（天文计算）确定二十八宿。
 
-    简化算法：从正月（农历1月）初一起，每天轮换一宿。
-    正月（农历第一个月）初一 = 虚宿（index 13）。
+    使用等分法，以角宿一 (Spica) 黄经为参考起点。
 
     Args:
-        lunar_month: 农历月 (1-12)
-        lunar_day: 农历日 (1-30)
-        lunar_year: 农历年 (影响是否有闰月，此处简化处理)
+        moon_ecliptic_lon: 月亮的黄道经度 (0-360)
 
     Returns:
-        包含星宿名和属性的字典
+        星宿信息字典
     """
-    # 计算从正月初一到目标日期的天数
-    # 简化：每月按大月30天、小月29天交替
-    days = 0
-    for m in range(1, lunar_month):
-        if m in [1, 3, 5, 7, 8, 10, 12]:
-            days += 30
-        else:
-            days += 29
-    days += (lunar_day - 1)
-
-    # 正月初一 = 虚宿 (index 13)
-    mansion_idx = (_LUNAR_NEW_YEAR_BASE + days) % 28
+    # 将月亮黄经映射到二十八宿索引
+    offset = (moon_ecliptic_lon - _JIAO_REF) % 360
+    mansion_idx = int(offset / _MANSION_WIDTH) % 28
     mansion_name = MANSION_NAMES[mansion_idx]
     data = MANSION_DATA.get(mansion_name, {})
 
@@ -86,4 +86,35 @@ def get_mansion_by_lunar_date(lunar_month: int, lunar_day: int, lunar_year: int 
         "animal": data.get("animal", ""),
         "direction": data.get("direction", ""),
         "personality": data.get("personality", ""),
+        "method": "moon_longitude",
+    }
+
+
+def get_mansion_by_lunar_date(lunar_month: int, lunar_day: int, lunar_year: int = 2024) -> dict:
+    """根据农历月日获取星宿信息（农历月固定起始宿法）。
+
+    每个农历月有固定的起始星宿，月内按日递推。
+    例如：正月起始为室宿，正月初十 = 井宿。
+
+    Args:
+        lunar_month: 农历月 (1-12)
+        lunar_day: 农历日 (1-30)
+        lunar_year: 农历年（保留，未来可用于年修正）
+
+    Returns:
+        包含星宿名和属性的字典
+    """
+    start_idx = MONTH_START_MANSION.get(lunar_month, 0)
+    mansion_idx = (start_idx + lunar_day - 1) % 28
+    mansion_name = MANSION_NAMES[mansion_idx]
+    data = MANSION_DATA.get(mansion_name, {})
+
+    return {
+        "name": mansion_name,
+        "index": mansion_idx + 1,
+        "element": data.get("element", ""),
+        "animal": data.get("animal", ""),
+        "direction": data.get("direction", ""),
+        "personality": data.get("personality", ""),
+        "method": "lunar_month",
     }

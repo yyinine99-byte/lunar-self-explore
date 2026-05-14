@@ -27,7 +27,7 @@
     -webkit-tap-highlight-color: transparent;
   }
   .app {
-    width: 100%; max-width: 460px;
+    width: 100%; max-width: 500px;
     background: var(--bg);
     min-height: 100vh;
     position: relative; overflow: hidden;
@@ -40,43 +40,45 @@
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 128 128' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='128' height='128' filter='url(%23n)' opacity='0.8'/%3E%3C/svg%3E");
   }
 
-  .screen { display: none; padding: 40px 28px 32px; }
+  .screen { display: none; padding: 40px 24px 32px; }
   .screen.active { display: block; }
 
   /* ── Screen 1: Input ── */
-  .s1-header { text-align: center; margin-bottom: 28px; }
-  .s1-header .emoji { font-size: 48px; margin-bottom: 12px; }
-  .s1-header h1 { color: var(--text); font-size: 26px; font-weight: 800; letter-spacing: 2px; margin-bottom: 6px; }
-  .s1-header p { color: var(--text-muted); font-size: 15px; letter-spacing: 1px; }
+  .s1-header { text-align: center; margin-bottom: 24px; }
+  .s1-header .emoji { font-size: 44px; margin-bottom: 10px; }
+  .s1-header h1 { color: var(--text); font-size: 24px; font-weight: 800; letter-spacing: 2px; margin-bottom: 4px; }
+  .s1-header p { color: var(--text-muted); font-size: 14px; letter-spacing: 1px; }
 
-  .form-group { margin-bottom: 16px; }
-  .form-label { display: block; color: rgba(185,170,145,0.55); font-size: 13px; letter-spacing: 2px; margin-bottom: 6px; text-transform: uppercase; }
+  .form-group { margin-bottom: 14px; }
+  .form-label { display: block; color: rgba(185,170,145,0.55); font-size: 12px; letter-spacing: 2px; margin-bottom: 5px; text-transform: uppercase; }
   .form-input, .form-select {
-    width: 100%; padding: 14px 16px;
+    width: 100%; padding: 13px 14px;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    color: var(--text); font-size: 16px;
+    border-radius: 10px;
+    color: var(--text); font-size: 15px;
     letter-spacing: 1px; outline: none;
     transition: border-color 0.2s;
     font-family: inherit;
     -webkit-appearance: none;
   }
   .form-input:focus, .form-select:focus { border-color: var(--gold-dim); }
-  .form-row { display: flex; gap: 10px; }
-  .form-row > * { flex: 1; }
+  .form-input::placeholder { color: rgba(236,229,213,0.25); }
+  .form-row { display: flex; gap: 6px; }
+  .form-row > * { flex: 1; min-width: 0; }
   .form-select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%23888'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: right 16px center;
-    padding-right: 36px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M5 7L1 3h8z' fill='%23888'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 8px center;
+    padding-right: 24px; font-size: 14px;
   }
   .form-select option { background: #1a1a1e; color: var(--text); }
-  .form-hint { color: rgba(236,229,213,0.3); font-size: 12px; letter-spacing: 1px; margin-top: 4px; }
+  .form-select.placeholder { color: rgba(236,229,213,0.25); }
+  .form-hint { color: rgba(236,229,213,0.3); font-size: 11px; letter-spacing: 1px; margin-top: 3px; }
 
   .btn {
-    width: 100%; padding: 16px;
-    border-radius: 14px; border: none;
-    font-size: 18px; font-weight: 700; letter-spacing: 3px;
+    width: 100%; padding: 15px;
+    border-radius: 12px; border: none;
+    font-size: 17px; font-weight: 700; letter-spacing: 3px;
     cursor: pointer; transition: all 0.2s;
     font-family: inherit;
   }
@@ -88,38 +90,32 @@
   .btn-primary:active { transform: scale(0.98); opacity: 0.8; }
   .btn-primary:disabled { opacity: 0.4; pointer-events: none; }
 
-  .privacy-note { text-align: center; margin-top: 20px; color: rgba(236,229,213,0.15); font-size: 12px; letter-spacing: 1px; line-height: 1.6; }
+  .privacy-note { text-align: center; margin-top: 18px; color: rgba(236,229,213,0.15); font-size: 11px; letter-spacing: 1px; line-height: 1.6; }
 
   /* ── Screen 2: Portrait ── */
-  .s2-header { text-align: center; margin-bottom: 20px; }
-  .s2-header h2 { color: var(--text); font-size: 24px; font-weight: 800; letter-spacing: 2px; margin-bottom: 6px; }
-  .s2-header .sub { color: var(--text-muted); font-size: 14px; letter-spacing: 1px; }
+  .s2-header { text-align: center; margin-bottom: 16px; }
+  .s2-header h2 { color: var(--text); font-size: 22px; font-weight: 800; letter-spacing: 2px; margin-bottom: 4px; }
+  .s2-header .sub { color: var(--text-muted); font-size: 13px; letter-spacing: 1px; }
 
   .tagline-box {
     background: linear-gradient(135deg, rgba(200,180,155,0.08) 0%, rgba(200,180,155,0.02) 100%);
     border: 1px solid rgba(200,180,155,0.15);
-    border-radius: 14px; padding: 18px 20px; margin-bottom: 16px; text-align: center;
+    border-radius: 14px; padding: 18px 20px; margin-bottom: 14px; text-align: center;
   }
-  .tagline-box .tagline {
-    color: var(--gold); font-size: 18px; font-weight: 700; letter-spacing: 2px; line-height: 1.6;
-  }
-  .tagline-box .tagline-sub {
-    color: var(--text-muted); font-size: 13px; letter-spacing: 1px; margin-top: 4px;
-  }
+  .tagline-box .tagline { color: var(--gold); font-size: 18px; font-weight: 700; letter-spacing: 2px; line-height: 1.6; }
+  .tagline-box .tagline-sub { color: var(--text-muted); font-size: 12px; letter-spacing: 1px; margin-top: 4px; }
 
   /* Toggle */
   .toggle-row {
     display: flex; align-items: center; justify-content: center;
-    gap: 12px; margin-bottom: 18px;
+    gap: 12px; margin-bottom: 16px;
   }
-  .toggle-label { color: var(--text-muted); font-size: 13px; letter-spacing: 1px; }
+  .toggle-label { color: var(--text-muted); font-size: 13px; letter-spacing: 1px; cursor: pointer; }
   .toggle-label.active { color: var(--gold); }
   .toggle-switch {
     width: 48px; height: 26px; border-radius: 13px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid var(--border);
-    position: relative; cursor: pointer;
-    transition: all 0.2s;
+    background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+    position: relative; cursor: pointer; transition: all 0.2s;
   }
   .toggle-switch.on { background: rgba(200,180,155,0.15); border-color: rgba(200,180,155,0.25); }
   .toggle-switch::after {
@@ -130,100 +126,129 @@
   .toggle-switch.on::after { left: 25px; background: var(--gold); }
 
   /* Cards */
-  .portrait-cards { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+  .portrait-cards { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
   .pcard {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px; padding: 18px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px;
   }
-  .pcard-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .pcard-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
   .pcard-icon {
-    width: 36px; height: 36px; border-radius: 50%;
+    width: 32px; height: 32px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 16px; border: 1px solid;
+    font-size: 14px; border: 1px solid;
   }
   .pcard:nth-child(1) .pcard-icon { background: rgba(170,140,190,0.12); color: var(--accent-1); border-color: rgba(176,142,192,0.2); }
   .pcard:nth-child(2) .pcard-icon { background: rgba(195,155,115,0.12); color: var(--accent-2); border-color: rgba(195,155,115,0.2); }
   .pcard:nth-child(3) .pcard-icon { background: rgba(120,150,190,0.12); color: var(--accent-3); border-color: rgba(125,150,190,0.2); }
-  .pcard-title { color: var(--text); font-size: 16px; font-weight: 700; letter-spacing: 2px; }
-  .pcard-content { color: var(--text-muted); font-size: 14px; letter-spacing: 1px; line-height: 1.7; }
+  .pcard-title { color: var(--text); font-size: 15px; font-weight: 700; letter-spacing: 2px; }
+  .pcard-content { color: var(--text-muted); font-size: 13px; letter-spacing: 1px; line-height: 1.7; }
   .pcard-content span { color: var(--gold); }
+  .pcard-content strong { color: var(--text); }
+
+  /* Donut Chart */
+  .donut-wrap { display: flex; align-items: center; gap: 16px; margin: 10px 0; }
+  .donut-svg { flex-shrink: 0; }
+  .donut-legend { display: flex; flex-direction: column; gap: 4px; font-size: 12px; letter-spacing: 1px; }
+  .donut-legend-item { display: flex; align-items: center; gap: 6px; }
+  .donut-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* Table */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 12px; letter-spacing: 1px; margin: 8px 0; }
+  .data-table th { color: var(--text-muted); font-weight: 400; text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); }
+  .data-table td { color: var(--text); padding: 6px 8px; border-bottom: 1px solid var(--border); }
+  .data-table .hi { color: var(--gold); font-weight: 600; }
+  .retro-tag { color: #c96; font-size: 11px; }
 
   .btn-secondary {
-    background: rgba(255,255,255,0.02);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-weight: 600; font-size: 16px; letter-spacing: 2px;
+    background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+    color: var(--text); font-weight: 600; font-size: 15px; letter-spacing: 2px;
   }
   .btn-secondary:active { transform: scale(0.98); opacity: 0.7; }
   .btn-back {
     background: none; border: none; color: var(--text-muted);
-    font-size: 14px; letter-spacing: 2px; text-align: center;
-    margin-top: 14px; cursor: pointer; display: block; width: 100%;
+    font-size: 13px; letter-spacing: 2px; text-align: center;
+    margin-top: 12px; cursor: pointer; display: block; width: 100%;
     font-family: inherit;
   }
 
   /* ── Screen 3: Chat ── */
-  .s3-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding-bottom: 14px; margin-bottom: 14px;
-    border-bottom: 1px solid var(--border);
+  .s3-top { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .s3-back {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text-muted); font-size: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
   }
-  .s3-header h2 { color: var(--text); font-size: 18px; font-weight: 700; letter-spacing: 2px; }
+  .s3-header h2 { color: var(--text); font-size: 17px; font-weight: 700; letter-spacing: 2px; }
   .s3-header .badge {
     background: rgba(200,180,155,0.1); border: 1px solid rgba(200,180,155,0.2);
-    border-radius: 20px; padding: 4px 12px;
-    color: var(--gold); font-size: 11px; letter-spacing: 1px;
+    border-radius: 20px; padding: 3px 10px;
+    color: var(--gold); font-size: 10px; letter-spacing: 1px; margin-left: 6px;
   }
-  .quick-questions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-  .quick-btn {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid var(--border);
-    border-radius: 20px; padding: 8px 14px;
+
+  /* Tabs */
+  .tabs { display: flex; gap: 0; margin-bottom: 10px; background: var(--surface); border-radius: 10px; padding: 3px; border: 1px solid var(--border); }
+  .tab {
+    flex: 1; text-align: center; padding: 8px 0; border-radius: 8px;
     color: var(--text-muted); font-size: 12px; letter-spacing: 1px;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  }
+  .tab.active { background: rgba(200,180,155,0.12); color: var(--gold); font-weight: 600; }
+
+  .sub-questions { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .sub-q-btn {
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    border-radius: 16px; padding: 6px 12px;
+    color: var(--text-muted); font-size: 11px; letter-spacing: 1px;
     cursor: pointer; white-space: nowrap; transition: all 0.2s;
     font-family: inherit;
   }
-  .quick-btn:active { background: rgba(200,180,155,0.08); border-color: var(--gold-dim); color: var(--gold); }
+  .sub-q-btn:active { background: rgba(200,180,155,0.08); border-color: var(--gold-dim); color: var(--gold); }
 
   .chat-messages {
     flex: 1; overflow-y: auto; padding-bottom: 14px;
-    display: flex; flex-direction: column; gap: 14px;
-    max-height: calc(100vh - 340px);
+    display: flex; flex-direction: column; gap: 12px;
+    max-height: calc(100vh - 360px);
   }
-  .msg { display: flex; gap: 10px; }
+  .msg { display: flex; gap: 8px; }
   .msg.user { justify-content: flex-end; }
   .msg-avatar {
-    width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center; font-size: 14px;
+    width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 13px;
   }
   .msg.assistant .msg-avatar { background: rgba(170,140,190,0.12); color: var(--accent-1); }
   .msg.user .msg-avatar { background: rgba(200,180,155,0.1); color: var(--gold); order: 1; }
   .msg-bubble {
-    max-width: 80%; padding: 12px 16px;
-    border-radius: 14px; font-size: 14px; letter-spacing: 1px; line-height: 1.7;
+    max-width: 82%; padding: 10px 14px;
+    border-radius: 12px; font-size: 13px; letter-spacing: 1px; line-height: 1.7;
   }
-  .msg.assistant .msg-bubble { background: var(--surface); border: 1px solid var(--border); color: var(--text); border-top-left-radius: 4px; }
-  .msg.user .msg-bubble { background: rgba(200,180,155,0.1); border: 1px solid rgba(200,180,155,0.15); color: var(--text); border-top-right-radius: 4px; }
+  .msg.assistant .msg-bubble { background: var(--surface); border: 1px solid var(--border); color: var(--text); border-top-left-radius: 3px; }
+  .msg.user .msg-bubble { background: rgba(200,180,155,0.1); border: 1px solid rgba(200,180,155,0.15); color: var(--text); border-top-right-radius: 3px; }
   .msg.typing .msg-bubble { color: var(--text-muted); }
 
+  /* Rendered table in chat */
+  .msg-bubble table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 11px; }
+  .msg-bubble table th { color: var(--gold); font-weight: 600; text-align: left; padding: 4px 6px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .msg-bubble table td { padding: 4px 6px; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text); }
+
   .chat-input-area {
-    display: flex; gap: 10px; padding-top: 14px;
+    display: flex; gap: 8px; padding-top: 12px;
     border-top: 1px solid var(--border);
     position: sticky; bottom: 0; background: var(--bg);
   }
   .chat-input {
-    flex: 1; padding: 14px 16px;
+    flex: 1; padding: 12px 14px;
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; color: var(--text); font-size: 15px;
+    border-radius: 10px; color: var(--text); font-size: 14px;
     letter-spacing: 1px; outline: none; font-family: inherit;
   }
   .chat-input:focus { border-color: var(--gold-dim); }
   .chat-send {
-    width: 48px; height: 48px; border-radius: 12px;
+    width: 44px; height: 44px; border-radius: 10px;
     background: linear-gradient(135deg, rgba(200,180,155,0.2) 0%, rgba(200,180,155,0.08) 100%);
     border: 1px solid rgba(200,180,155,0.25);
-    color: var(--gold); font-size: 20px;
+    color: var(--gold); font-size: 18px;
     cursor: pointer; display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
   }
@@ -231,23 +256,24 @@
   .chat-send:disabled { opacity: 0.4; }
 
   .spinner {
-    display: inline-block; width: 20px; height: 20px;
+    display: inline-block; width: 18px; height: 18px;
     border: 2px solid rgba(200,180,155,0.2);
     border-top-color: var(--gold);
     border-radius: 50%; animation: spin 0.8s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  .loading-state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 60px 20px; }
-  .loading-state p { color: var(--text-muted); font-size: 15px; letter-spacing: 2px; }
+  .loading-state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 50px 20px; }
+  .loading-state p { color: var(--text-muted); font-size: 14px; letter-spacing: 2px; }
 
   ::-webkit-scrollbar { width: 3px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
 
-  .day-select { max-width: 80px; }
-  .year-select { max-width: 110px; }
-  .month-select { max-width: 90px; }
+  /* Aspect Grid */
+  .aspect-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 4px; margin: 6px 0; }
+  .aspect-cell { text-align: center; padding: 4px 2px; border-radius: 6px; font-size: 10px; letter-spacing: 0.5px; background: rgba(255,255,255,0.02); }
+  .aspect-cell.major { background: rgba(200,180,155,0.1); color: var(--gold); }
 </style>
 </head>
 <body>
@@ -265,47 +291,32 @@
     <div class="form-group">
       <label class="form-label">出生日期 (年-月-日)</label>
       <div class="form-row">
-        <select class="form-select year-select" id="birth-year"></select>
-        <select class="form-select month-select" id="birth-month"></select>
-        <select class="form-select day-select" id="birth-day"></select>
+        <select class="form-select" id="birth-year"><option value="">年份</option></select>
+        <select class="form-select" id="birth-month"><option value="">月份</option></select>
+        <select class="form-select" id="birth-day"><option value="">日期</option></select>
       </div>
     </div>
 
     <div class="form-group">
       <label class="form-label">出生时间</label>
-      <input type="time" class="form-input" id="birth-time" value="12:00">
-      <div class="form-hint">如果不确定具体时间，选一个大概的时间</div>
+      <input type="time" class="form-input" id="birth-time" placeholder="12:00">
+      <div class="form-hint">不确定具体时间可选一个大概的时间</div>
     </div>
 
     <div class="form-group">
-      <label class="form-label">出生地点</label>
-      <select class="form-select" id="country" onchange="onCountryChange()">
-        <option value="中国" selected>中国</option>
-        <option value="美国">美国</option>
-        <option value="日本">日本</option>
-        <option value="韩国">韩国</option>
-        <option value="英国">英国</option>
-        <option value="法国">法国</option>
-        <option value="德国">德国</option>
-        <option value="加拿大">加拿大</option>
-        <option value="澳大利亚">澳大利亚</option>
-        <option value="新加坡">新加坡</option>
-      </select>
-    </div>
-
-    <div class="form-group" id="province-group">
-      <label class="form-label">省份</label>
-      <select class="form-select" id="province" onchange="onProvinceChange()"></select>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">城市</label>
-      <select class="form-select" id="city"></select>
+      <label class="form-label">出生地点 (国家·省·市·区)</label>
+      <div class="form-row">
+        <select class="form-select" id="country" onchange="onCountryChange()" style="flex:1.1"><option value="中国" selected>中国</option></select>
+        <select class="form-select" id="province" onchange="onProvinceChange()"><option value="">省份</option></select>
+        <select class="form-select" id="city" onchange="onCityChange()"><option value="">城市</option></select>
+        <select class="form-select" id="district"><option value="">区县</option></select>
+      </div>
     </div>
 
     <div class="form-group">
       <label class="form-label">性别</label>
       <select class="form-select" id="gender">
+        <option value="">请选择</option>
         <option value="male">男</option>
         <option value="female">女</option>
       </select>
@@ -324,30 +335,31 @@
       <div class="sub" id="portrait-date"></div>
     </div>
     <div id="portrait-content">
-      <div class="loading-state">
-        <div class="spinner"></div>
-        <p>正在计算...</p>
-      </div>
+      <div class="loading-state"><div class="spinner"></div><p>正在计算...</p></div>
     </div>
   </div>
 
   <!-- ═══ Screen 3: Chat ═══ -->
   <div class="screen" id="screen-chat">
-    <div class="s3-header">
-      <h2>AI 深度分析</h2>
-      <span class="badge">已加载画像数据</span>
+    <div class="s3-top">
+      <button class="s3-back" onclick="backToPortrait()" title="返回画像">←</button>
+      <div class="s3-header">
+        <h2>AI 深度分析 <span class="badge">画像已加载</span></h2>
+      </div>
     </div>
-    <div class="quick-questions" id="quick-questions">
-      <button class="quick-btn" onclick="sendQuick('我最大的天赋盲区是什么？')">🔍 天赋盲区</button>
-      <button class="quick-btn" onclick="sendQuick('我在关系中的互动模式是怎样的？')">💫 关系模式</button>
-      <button class="quick-btn" onclick="sendQuick('当前阶段我应该聚焦什么方向？')">🧭 方向指引</button>
+
+    <div class="tabs" id="question-tabs">
+      <div class="tab active" data-tab="talent" onclick="switchTab('talent')">🔍 天赋盲区</div>
+      <div class="tab" data-tab="relation" onclick="switchTab('relation')">💫 关系模式</div>
+      <div class="tab" data-tab="direction" onclick="switchTab('direction')">🧭 方向指引</div>
     </div>
+
+    <div class="sub-questions" id="sub-questions"></div>
+
     <div class="chat-messages" id="chat-messages">
       <div class="msg assistant">
         <div class="msg-avatar">✦</div>
-        <div class="msg-bubble">
-          我已根据你的信息完成了综合分析。你可以直接问我问题，也可以点击上面的快捷问题开始。
-        </div>
+        <div class="msg-bubble">我已根据你的信息完成了综合分析。你可以直接问我问题，也可以点击上面的快捷问题开始。</div>
       </div>
     </div>
     <div class="chat-input-area">
@@ -359,141 +371,202 @@
 </div>
 
 <script>
-// ─── City Database ───
+// ═══════════════════════════════════════════
+// City Database with Districts
+// ═══════════════════════════════════════════
 const CITY_DATA = {
   '中国': {
     tz: 8,
     provinces: {
-      '北京': { cities: { '北京': [116.4074,39.9042] } },
-      '上海': { cities: { '上海': [121.4737,31.2304] } },
-      '天津': { cities: { '天津': [117.2008,39.0851] } },
-      '重庆': { cities: { '重庆': [106.5044,29.5317] } },
+      '北京': { cities: { '北京': { coords: [116.4074,39.9042], districts: ['东城区','西城区','朝阳区','海淀区','丰台区','石景山区','通州区','大兴区','顺义区','昌平区','房山区','门头沟区','平谷区','怀柔区','密云区','延庆区'] } } },
+      '上海': { cities: { '上海': { coords: [121.4737,31.2304], districts: ['黄浦区','徐汇区','长宁区','静安区','普陀区','虹口区','杨浦区','浦东新区','闵行区','宝山区','嘉定区','松江区','青浦区','奉贤区','金山区','崇明区'] } } },
+      '天津': { cities: { '天津': { coords: [117.2008,39.0851], districts: ['和平区','河东区','河西区','南开区','河北区','红桥区','滨海新区','东丽区','西青区','津南区','北辰区','武清区','宝坻区','静海区','宁河区','蓟州区'] } } },
+      '重庆': { cities: { '重庆': { coords: [106.5044,29.5317], districts: ['渝中区','江北区','南岸区','沙坪坝区','九龙坡区','大渡口区','北碚区','渝北区','巴南区','涪陵区','万州区','黔江区','长寿区','江津区','合川区','永川区'] } } },
       '广东': { cities: {
-        '广州': [113.2644,23.1291], '深圳': [114.0579,22.5431],
-        '东莞': [113.7517,23.0205], '佛山': [113.1214,23.0218],
-        '珠海': [113.5767,22.2707], '惠州': [114.4156,23.1118],
-        '中山': [113.3823,22.5159], '汕头': [116.6821,23.3535]
+        '广州': { coords: [113.2644,23.1291], districts: ['天河区','越秀区','荔湾区','海珠区','白云区','番禺区','黄埔区','南沙区','花都区','增城区','从化区'] },
+        '深圳': { coords: [114.0579,22.5431], districts: ['南山区','福田区','罗湖区','宝安区','龙岗区','龙华区','光明区','坪山区','盐田区'] },
+        '东莞': { coords: [113.7517,23.0205], districts: ['莞城区','南城区','东城区','万江区','虎门镇','长安镇','厚街镇'] },
+        '佛山': { coords: [113.1214,23.0218], districts: ['禅城区','南海区','顺德区','三水区','高明区'] },
+        '珠海': { coords: [113.5767,22.2707], districts: ['香洲区','斗门区','金湾区'] },
+        '惠州': { coords: [114.4156,23.1118], districts: ['惠城区','惠阳区','博罗县','惠东县','龙门县'] },
+        '中山': { coords: [113.3823,22.5159], districts: ['石岐区','东区','西区','南区','火炬开发区'] },
+        '汕头': { coords: [116.6821,23.3535], districts: ['金平区','龙湖区','濠江区','潮阳区','潮南区','澄海区'] },
+        '湛江': { coords: [110.3589,21.2707], districts: ['赤坎区','霞山区','坡头区','麻章区'] },
+        '江门': { coords: [113.0819,22.5787], districts: ['蓬江区','江海区','新会区'] },
+        '肇庆': { coords: [112.4650,23.0472], districts: ['端州区','鼎湖区','高要区'] },
+        '茂名': { coords: [110.9254,21.6629], districts: ['茂南区','电白区'] },
+        '清远': { coords: [113.0560,23.6818], districts: ['清城区','清新区'] }
       }},
       '浙江': { cities: {
-        '杭州': [120.1551,30.2741], '宁波': [121.5497,29.8683],
-        '温州': [120.6993,27.9939], '嘉兴': [120.7556,30.7465],
-        '绍兴': [120.5802,30.0303], '金华': [119.6475,29.0791]
+        '杭州': { coords: [120.1551,30.2741], districts: ['西湖区','上城区','拱墅区','滨江区','萧山区','余杭区','临平区','钱塘区','富阳区','临安区'] },
+        '宁波': { coords: [121.5497,29.8683], districts: ['海曙区','江北区','鄞州区','镇海区','北仑区','奉化区'] },
+        '温州': { coords: [120.6993,27.9939], districts: ['鹿城区','龙湾区','瓯海区','洞头区'] },
+        '嘉兴': { coords: [120.7556,30.7465], districts: ['南湖区','秀洲区'] },
+        '绍兴': { coords: [120.5802,30.0303], districts: ['越城区','柯桥区','上虞区'] },
+        '金华': { coords: [119.6475,29.0791], districts: ['婺城区','金东区'] },
+        '台州': { coords: [121.4207,28.6563], districts: ['椒江区','黄岩区','路桥区'] },
+        '湖州': { coords: [120.0880,30.8930], districts: ['吴兴区','南浔区'] }
       }},
       '江苏': { cities: {
-        '南京': [118.7781,32.0570], '苏州': [120.5853,31.2989],
-        '无锡': [120.3119,31.4909], '徐州': [117.1881,34.2047],
-        '常州': [119.9736,31.8108], '南通': [120.8937,31.9799]
+        '南京': { coords: [118.7781,32.0570], districts: ['玄武区','秦淮区','建邺区','鼓楼区','栖霞区','雨花台区','江宁区','浦口区','六合区','溧水区','高淳区'] },
+        '苏州': { coords: [120.5853,31.2989], districts: ['姑苏区','虎丘区','吴中区','相城区','吴江区','工业园区'] },
+        '无锡': { coords: [120.3119,31.4909], districts: ['梁溪区','锡山区','惠山区','滨湖区','新吴区','江阴市','宜兴市'] },
+        '徐州': { coords: [117.1881,34.2047], districts: ['鼓楼区','云龙区','泉山区','铜山区','贾汪区'] },
+        '常州': { coords: [119.9736,31.8108], districts: ['天宁区','钟楼区','新北区','武进区','金坛区'] },
+        '南通': { coords: [120.8937,31.9799], districts: ['崇川区','通州区','海门区'] },
+        '扬州': { coords: [119.4129,32.3936], districts: ['广陵区','邗江区','江都区'] }
       }},
       '山东': { cities: {
-        '济南': [117.0249,36.6758], '青岛': [120.3826,36.0671],
-        '烟台': [121.4479,37.4635], '威海': [122.1204,37.5131],
-        '潍坊': [119.1617,36.7068], '临沂': [118.3564,35.1046]
+        '济南': { coords: [117.0249,36.6758], districts: ['历下区','市中区','槐荫区','天桥区','历城区','长清区','章丘区','莱芜区'] },
+        '青岛': { coords: [120.3826,36.0671], districts: ['市南区','市北区','李沧区','崂山区','城阳区','黄岛区','即墨区'] },
+        '烟台': { coords: [121.4479,37.4635], districts: ['芝罘区','福山区','牟平区','莱山区','蓬莱区'] },
+        '威海': { coords: [122.1204,37.5131], districts: ['环翠区','文登区'] },
+        '潍坊': { coords: [119.1617,36.7068], districts: ['潍城区','寒亭区','坊子区','奎文区'] },
+        '临沂': { coords: [118.3564,35.1046], districts: ['兰山区','罗庄区','河东区'] }
       }},
       '四川': { cities: {
-        '成都': [104.0657,30.6599], '绵阳': [104.6791,31.4675],
-        '宜宾': [104.6433,28.7512], '德阳': [104.3979,31.1267],
-        '乐山': [103.7655,29.5521], '南充': [106.1107,30.8378]
+        '成都': { coords: [104.0657,30.6599], districts: ['锦江区','青羊区','金牛区','武侯区','成华区','高新区','天府新区','龙泉驿区','双流区','温江区','郫都区','新都区','青白江区'] },
+        '绵阳': { coords: [104.6791,31.4675], districts: ['涪城区','游仙区','安州区'] },
+        '宜宾': { coords: [104.6433,28.7512], districts: ['翠屏区','南溪区','叙州区'] },
+        '德阳': { coords: [104.3979,31.1267], districts: ['旌阳区','罗江区'] },
+        '乐山': { coords: [103.7655,29.5521], districts: ['市中区','五通桥区','沙湾区','金口河区'] },
+        '南充': { coords: [106.1107,30.8378], districts: ['顺庆区','高坪区','嘉陵区'] }
       }},
       '湖北': { cities: {
-        '武汉': [114.2985,30.5843], '宜昌': [111.2864,30.6918],
-        '襄阳': [112.1224,32.0090], '荆州': [112.2397,30.3352]
+        '武汉': { coords: [114.2985,30.5843], districts: ['武昌区','洪山区','江岸区','江汉区','硚口区','汉阳区','青山区','东西湖区','蔡甸区','江夏区','黄陂区','新洲区'] },
+        '宜昌': { coords: [111.2864,30.6918], districts: ['西陵区','伍家岗区','点军区','猇亭区','夷陵区'] },
+        '襄阳': { coords: [112.1224,32.0090], districts: ['襄城区','樊城区','襄州区'] },
+        '荆州': { coords: [112.2397,30.3352], districts: ['沙市区','荆州区'] }
       }},
       '湖南': { cities: {
-        '长沙': [112.9388,28.2279], '岳阳': [113.1289,29.3571],
-        '株洲': [113.1338,27.8276], '衡阳': [112.5719,26.8932],
-        '张家界': [110.4789,29.1167]
+        '长沙': { coords: [112.9388,28.2279], districts: ['岳麓区','芙蓉区','天心区','开福区','雨花区','望城区','长沙县'] },
+        '岳阳': { coords: [113.1289,29.3571], districts: ['岳阳楼区','云溪区','君山区'] },
+        '株洲': { coords: [113.1338,27.8276], districts: ['天元区','荷塘区','芦淞区','石峰区'] },
+        '衡阳': { coords: [112.5719,26.8932], districts: ['蒸湘区','珠晖区','雁峰区','石鼓区'] },
+        '张家界': { coords: [110.4789,29.1167], districts: ['永定区','武陵源区'] }
       }},
       '河南': { cities: {
-        '郑州': [113.6253,34.7466], '洛阳': [112.4539,34.6182],
-        '开封': [114.3076,34.7972], '南阳': [112.5283,32.9907]
+        '郑州': { coords: [113.6253,34.7466], districts: ['金水区','二七区','中原区','管城区','惠济区','上街区'] },
+        '洛阳': { coords: [112.4539,34.6182], districts: ['洛龙区','西工区','老城区','瀍河区','涧西区'] },
+        '开封': { coords: [114.3076,34.7972], districts: ['鼓楼区','龙亭区','禹王台区','祥符区'] },
+        '南阳': { coords: [112.5283,32.9907], districts: ['宛城区','卧龙区'] }
       }},
       '河北': { cities: {
-        '石家庄': [114.5148,38.0423], '唐山': [118.1801,39.6305],
-        '保定': [115.4652,38.8738], '邯郸': [114.5391,36.6255],
-        '廊坊': [116.6837,39.3766]
+        '石家庄': { coords: [114.5148,38.0423], districts: ['长安区','桥西区','新华区','裕华区','藁城区','鹿泉区','栾城区'] },
+        '唐山': { coords: [118.1801,39.6305], districts: ['路北区','路南区','古冶区','开平区','丰润区','丰南区'] },
+        '保定': { coords: [115.4652,38.8738], districts: ['竞秀区','莲池区','满城区','清苑区','徐水区'] },
+        '邯郸': { coords: [114.5391,36.6255], districts: ['丛台区','邯山区','复兴区','峰峰矿区'] },
+        '廊坊': { coords: [116.6837,39.3766], districts: ['广阳区','安次区'] }
       }},
       '陕西': { cities: {
-        '西安': [108.9402,34.2611], '咸阳': [108.7089,34.3296],
-        '宝鸡': [107.2377,34.3619], '延安': [109.4897,36.5853]
+        '西安': { coords: [108.9402,34.2611], districts: ['雁塔区','碑林区','未央区','莲湖区','新城区','长安区','灞桥区','临潼区','阎良区','高陵区','鄠邑区'] },
+        '咸阳': { coords: [108.7089,34.3296], districts: ['秦都区','渭城区'] },
+        '宝鸡': { coords: [107.2377,34.3619], districts: ['渭滨区','金台区','陈仓区'] },
+        '延安': { coords: [109.4897,36.5853], districts: ['宝塔区','安塞区'] }
       }},
       '山西': { cities: {
-        '太原': [112.5534,37.8706], '大同': [113.3001,40.0762],
-        '临汾': [111.5190,36.0880], '运城': [111.0069,35.0265]
+        '太原': { coords: [112.5534,37.8706], districts: ['小店区','迎泽区','杏花岭区','尖草坪区','万柏林区','晋源区'] },
+        '大同': { coords: [113.3001,40.0762], districts: ['平城区','云冈区','新荣区','云州区'] },
+        '临汾': { coords: [111.5190,36.0880], districts: ['尧都区'] },
+        '运城': { coords: [111.0069,35.0265], districts: ['盐湖区'] }
       }},
       '辽宁': { cities: {
-        '沈阳': [123.4315,41.8057], '大连': [121.6147,38.9140],
-        '鞍山': [122.9945,41.1078], '抚顺': [123.9572,41.8808]
+        '沈阳': { coords: [123.4315,41.8057], districts: ['和平区','沈河区','大东区','皇姑区','铁西区','浑南区','于洪区','沈北新区','苏家屯区'] },
+        '大连': { coords: [121.6147,38.9140], districts: ['中山区','西岗区','沙河口区','甘井子区','旅顺口区','金州区'] },
+        '鞍山': { coords: [122.9945,41.1078], districts: ['铁东区','铁西区','立山区','千山区'] },
+        '抚顺': { coords: [123.9572,41.8808], districts: ['新抚区','望花区','东洲区','顺城区'] }
       }},
       '吉林': { cities: {
-        '长春': [125.3235,43.8169], '吉林': [126.5495,43.8378],
-        '延吉': [129.5089,42.8910]
+        '长春': { coords: [125.3235,43.8169], districts: ['南关区','朝阳区','宽城区','二道区','绿园区','九台区'] },
+        '吉林': { coords: [126.5495,43.8378], districts: ['船营区','昌邑区','龙潭区','丰满区'] },
+        '延吉': { coords: [129.5089,42.8910], districts: ['延吉市'] }
       }},
       '黑龙江': { cities: {
-        '哈尔滨': [126.6424,45.7567], '大庆': [125.1030,46.5876],
-        '齐齐哈尔': [123.9181,47.3543]
+        '哈尔滨': { coords: [126.6424,45.7567], districts: ['道里区','南岗区','道外区','香坊区','松北区','平房区','呼兰区','阿城区'] },
+        '大庆': { coords: [125.1030,46.5876], districts: ['萨尔图区','让胡路区','龙凤区','红岗区'] },
+        '齐齐哈尔': { coords: [123.9181,47.3543], districts: ['龙沙区','建华区','铁锋区'] }
       }},
       '福建': { cities: {
-        '福州': [119.2965,26.0745], '厦门': [118.0894,24.4798],
-        '泉州': [118.6758,24.8741], '漳州': [117.6475,24.5130]
+        '福州': { coords: [119.2965,26.0745], districts: ['鼓楼区','台江区','仓山区','晋安区','马尾区','长乐区'] },
+        '厦门': { coords: [118.0894,24.4798], districts: ['思明区','湖里区','集美区','海沧区','同安区','翔安区'] },
+        '泉州': { coords: [118.6758,24.8741], districts: ['鲤城区','丰泽区','洛江区','泉港区'] },
+        '漳州': { coords: [117.6475,24.5130], districts: ['芗城区','龙文区'] }
       }},
       '安徽': { cities: {
-        '合肥': [117.2272,31.8205], '芜湖': [118.4329,31.3525],
-        '黄山': [118.3375,29.7147]
+        '合肥': { coords: [117.2272,31.8205], districts: ['蜀山区','包河区','庐阳区','瑶海区','滨湖新区'] },
+        '芜湖': { coords: [118.4329,31.3525], districts: ['镜湖区','鸠江区','弋江区'] },
+        '黄山': { coords: [118.3375,29.7147], districts: ['屯溪区','黄山区','徽州区'] }
       }},
       '江西': { cities: {
-        '南昌': [115.8579,28.6820], '九江': [116.0019,29.7050],
-        '景德镇': [117.1784,29.2686], '赣州': [114.9347,25.8310]
+        '南昌': { coords: [115.8579,28.6820], districts: ['东湖区','西湖区','青云谱区','青山湖区','新建区','红谷滩区'] },
+        '九江': { coords: [116.0019,29.7050], districts: ['浔阳区','濂溪区','柴桑区'] },
+        '景德镇': { coords: [117.1784,29.2686], districts: ['昌江区','珠山区'] },
+        '赣州': { coords: [114.9347,25.8310], districts: ['章贡区','南康区','赣县区'] }
       }},
       '贵州': { cities: {
-        '贵阳': [106.6301,26.6476], '遵义': [106.9272,27.7256]
+        '贵阳': { coords: [106.6301,26.6476], districts: ['南明区','云岩区','花溪区','乌当区','白云区','观山湖区'] },
+        '遵义': { coords: [106.9272,27.7256], districts: ['红花岗区','汇川区','播州区'] }
       }},
       '云南': { cities: {
-        '昆明': [102.8328,24.8799], '大理': [100.2676,25.6065],
-        '丽江': [100.2271,26.8566], '西双版纳': [100.7998,22.0094]
+        '昆明': { coords: [102.8328,24.8799], districts: ['五华区','盘龙区','官渡区','西山区','呈贡区'] },
+        '大理': { coords: [100.2676,25.6065], districts: ['大理市'] },
+        '丽江': { coords: [100.2271,26.8566], districts: ['古城区'] },
+        '西双版纳': { coords: [100.7998,22.0094], districts: ['景洪市'] }
       }},
       '甘肃': { cities: {
-        '兰州': [103.8343,36.0610], '敦煌': [94.6619,40.1421],
-        '天水': [105.7249,34.5808]
+        '兰州': { coords: [103.8343,36.0610], districts: ['城关区','七里河区','安宁区','西固区'] },
+        '敦煌': { coords: [94.6619,40.1421], districts: ['敦煌市'] },
+        '天水': { coords: [105.7249,34.5808], districts: ['秦州区','麦积区'] }
       }},
       '广西': { cities: {
-        '南宁': [108.3661,22.8170], '桂林': [110.2900,25.2736],
-        '柳州': [109.4155,24.3264], '北海': [109.1200,21.4811]
+        '南宁': { coords: [108.3661,22.8170], districts: ['青秀区','兴宁区','江南区','西乡塘区','良庆区','邕宁区'] },
+        '桂林': { coords: [110.2900,25.2736], districts: ['象山区','秀峰区','叠彩区','七星区','雁山区','临桂区'] },
+        '柳州': { coords: [109.4155,24.3264], districts: ['城中区','鱼峰区','柳南区','柳北区'] },
+        '北海': { coords: [109.1200,21.4811], districts: ['海城区','银海区','铁山港区'] }
       }},
       '海南': { cities: {
-        '海口': [110.1998,20.0199], '三亚': [109.5119,18.2528]
+        '海口': { coords: [110.1998,20.0199], districts: ['龙华区','美兰区','琼山区','秀英区'] },
+        '三亚': { coords: [109.5119,18.2528], districts: ['吉阳区','天涯区','海棠区','崖州区'] }
       }},
       '内蒙古': { cities: {
-        '呼和浩特': [111.7490,40.8423], '包头': [109.8401,40.6578],
-        '鄂尔多斯': [109.7808,39.6083]
+        '呼和浩特': { coords: [111.7490,40.8423], districts: ['新城区','回民区','玉泉区','赛罕区'] },
+        '包头': { coords: [109.8401,40.6578], districts: ['昆都仑区','东河区','青山区'] },
+        '鄂尔多斯': { coords: [109.7808,39.6083], districts: ['东胜区','康巴什区'] }
       }},
       '新疆': { cities: {
-        '乌鲁木齐': [87.6168,43.7930], '喀什': [75.9897,39.4704]
+        '乌鲁木齐': { coords: [87.6168,43.7930], districts: ['天山区','沙依巴克区','新市区','水磨沟区','头屯河区','米东区'] },
+        '喀什': { coords: [75.9897,39.4704], districts: ['喀什市'] }
       }},
       '西藏': { cities: {
-        '拉萨': [91.1320,29.6593], '日喀则': [88.8851,29.2669]
+        '拉萨': { coords: [91.1320,29.6593], districts: ['城关区'] },
+        '日喀则': { coords: [88.8851,29.2669], districts: ['桑珠孜区'] }
       }},
-      '宁夏': { cities: { '银川': [106.2309,38.4872] } },
-      '青海': { cities: { '西宁': [101.7782,36.6171] } },
-      '香港': { cities: { '香港': [114.1733,22.3193] } },
-      '澳门': { cities: { '澳门': [113.5491,22.1987] } },
+      '宁夏': { cities: { '银川': { coords: [106.2309,38.4872], districts: ['兴庆区','金凤区','西夏区'] } } },
+      '青海': { cities: { '西宁': { coords: [101.7782,36.6171], districts: ['城中区','城东区','城西区','城北区'] } } },
+      '香港': { cities: { '香港': { coords: [114.1733,22.3193], districts: ['中西区','湾仔区','东区','南区','油尖旺区','深水埗区','九龙城区','观塘区','沙田区','荃湾区'] } } },
+      '澳门': { cities: { '澳门': { coords: [113.5491,22.1987], districts: ['澳门半岛','氹仔','路环'] } } },
       '台湾': { cities: {
-        '台北': [121.5497,25.0383], '高雄': [120.3016,22.6273],
-        '台中': [120.6798,24.1384], '台南': [120.2190,22.9997]
+        '台北': { coords: [121.5497,25.0383], districts: ['中正区','大同区','中山区','松山区','大安区','信义区','内湖区','士林区','北投区'] },
+        '高雄': { coords: [120.3016,22.6273], districts: ['苓雅区','前镇区','三民区','新兴区'] },
+        '台中': { coords: [120.6798,24.1384], districts: ['中区','东区','西区','北区','南屯区','西屯区'] },
+        '台南': { coords: [120.2190,22.9997], districts: ['中西区','东区','安平区','北区'] }
       } }
     }
   },
-  '美国': { tz: -5, provinces: { '纽约': { cities: { '纽约': [-74.006,40.7128] } }, '加利福尼亚': { cities: { '洛杉矶': [-118.2437,34.0522], '旧金山': [-122.4194,37.7749] } }, '伊利诺伊': { cities: { '芝加哥': [-87.6298,41.8781] } }, '华盛顿': { cities: { '西雅图': [-122.3321,47.6062] } } } },
-  '日本': { tz: 9, provinces: { '东京': { cities: { '东京': [139.6917,35.6895] } }, '大阪': { cities: { '大阪': [135.5023,34.6937] } }, '京都': { cities: { '京都': [135.7681,35.0116] } }, '北海道': { cities: { '札幌': [141.3469,43.0683] } } } },
-  '韩国': { tz: 9, provinces: { '首尔': { cities: { '首尔': [126.9780,37.5665] } }, '釜山': { cities: { '釜山': [129.0756,35.1796] } } } },
-  '英国': { tz: 0, provinces: { '英格兰': { cities: { '伦敦': [-0.1276,51.5074], '曼彻斯特': [-2.2426,53.4808] } } } },
-  '法国': { tz: 1, provinces: { '法兰西岛': { cities: { '巴黎': [2.3522,48.8566] } }, '罗讷': { cities: { '里昂': [4.8357,45.7640] } } } },
-  '德国': { tz: 1, provinces: { '柏林': { cities: { '柏林': [13.4050,52.5200] } }, '巴伐利亚': { cities: { '慕尼黑': [11.5820,48.1351] } } } },
-  '加拿大': { tz: -5, provinces: { '安大略': { cities: { '多伦多': [-79.3832,43.6532] } }, '不列颠哥伦比亚': { cities: { '温哥华': [-123.1207,49.2827] } } } },
-  '澳大利亚': { tz: 10, provinces: { '新南威尔士': { cities: { '悉尼': [151.2093,-33.8688] } }, '维多利亚': { cities: { '墨尔本': [144.9631,-37.8136] } } } },
-  '新加坡': { tz: 8, provinces: { '新加坡': { cities: { '新加坡': [103.8198,1.3521] } } } }
+  '美国': { tz: -5, provinces: { '纽约州': { cities: { '纽约': { coords: [-74.006,40.7128], districts: ['曼哈顿','布鲁克林','皇后区','布朗克斯'] } } }, '加利福尼亚州': { cities: { '洛杉矶': { coords: [-118.2437,34.0522], districts: ['洛杉矶'] }, '旧金山': { coords: [-122.4194,37.7749], districts: ['旧金山'] } } }, '伊利诺伊州': { cities: { '芝加哥': { coords: [-87.6298,41.8781], districts: ['芝加哥'] } } }, '华盛顿州': { cities: { '西雅图': { coords: [-122.3321,47.6062], districts: ['西雅图'] } } } } },
+  '日本': { tz: 9, provinces: { '东京都': { cities: { '东京': { coords: [139.6917,35.6895], districts: ['千代田区','新宿区','涩谷区','港区','中央区','文京区','台东区'] } } }, '大阪府': { cities: { '大阪': { coords: [135.5023,34.6937], districts: ['大阪'] } } }, '京都府': { cities: { '京都': { coords: [135.7681,35.0116], districts: ['京都'] } } }, '北海道': { cities: { '札幌': { coords: [141.3469,43.0683], districts: ['札幌'] } } } } },
+  '韩国': { tz: 9, provinces: { '首尔特别市': { cities: { '首尔': { coords: [126.9780,37.5665], districts: ['江南区','钟路区','麻浦区','龙山区'] } } }, '釜山广域市': { cities: { '釜山': { coords: [129.0756,35.1796], districts: ['釜山'] } } } } },
+  '英国': { tz: 0, provinces: { '英格兰': { cities: { '伦敦': { coords: [-0.1276,51.5074], districts: ['威斯敏斯特','肯辛顿','卡姆登'] }, '曼彻斯特': { coords: [-2.2426,53.4808], districts: ['曼彻斯特'] } } } } },
+  '法国': { tz: 1, provinces: { '法兰西岛': { cities: { '巴黎': { coords: [2.3522,48.8566], districts: ['巴黎'] } } }, '罗讷省': { cities: { '里昂': { coords: [4.8357,45.7640], districts: ['里昂'] } } } } },
+  '德国': { tz: 1, provinces: { '柏林': { cities: { '柏林': { coords: [13.4050,52.5200], districts: ['柏林'] } } }, '巴伐利亚': { cities: { '慕尼黑': { coords: [11.5820,48.1351], districts: ['慕尼黑'] } } } } },
+  '加拿大': { tz: -5, provinces: { '安大略省': { cities: { '多伦多': { coords: [-79.3832,43.6532], districts: ['多伦多'] } } }, '不列颠哥伦比亚省': { cities: { '温哥华': { coords: [-123.1207,49.2827], districts: ['温哥华'] } } } } },
+  '澳大利亚': { tz: 10, provinces: { '新南威尔士州': { cities: { '悉尼': { coords: [151.2093,-33.8688], districts: ['悉尼'] } } }, '维多利亚州': { cities: { '墨尔本': { coords: [144.9631,-37.8136], districts: ['墨尔本'] } } } } },
+  '新加坡': { tz: 8, provinces: { '新加坡': { cities: { '新加坡': { coords: [103.8198,1.3521], districts: ['中央区','东北区','西北区','东南区','西南区'] } } } } }
 };
 
-// ─── Init ───
+// ═══════════════════════════════════════════
+// Init Date Selects — default empty
+// ═══════════════════════════════════════════
 function initDateSelects() {
   const ySel = document.getElementById('birth-year');
   const mSel = document.getElementById('birth-month');
@@ -502,63 +575,52 @@ function initDateSelects() {
   for (let y = 2026; y >= 1950; y--) {
     const opt = document.createElement('option');
     opt.value = y; opt.textContent = y + '年';
-    if (y === 1995) opt.selected = true;
     ySel.appendChild(opt);
   }
 
   for (let m = 1; m <= 12; m++) {
     const opt = document.createElement('option');
     opt.value = m; opt.textContent = m + '月';
-    if (m === 6) opt.selected = true;
     mSel.appendChild(opt);
   }
 
   function updateDays() {
     const y = parseInt(ySel.value);
     const m = parseInt(mSel.value);
+    const cur = dSel.value;
+    dSel.innerHTML = '<option value="">日期</option>';
+    if (!y || !m) return;
     const daysInMonth = new Date(y, m, 0).getDate();
-    const cur = parseInt(dSel.value) || 15;
-    dSel.innerHTML = '';
     for (let d = 1; d <= daysInMonth; d++) {
       const opt = document.createElement('option');
       opt.value = d; opt.textContent = d + '日';
-      if (d === Math.min(cur, daysInMonth)) opt.selected = true;
+      if (cur && parseInt(cur) === d) opt.selected = true;
       dSel.appendChild(opt);
     }
   }
 
   ySel.addEventListener('change', updateDays);
   mSel.addEventListener('change', updateDays);
-  updateDays();
 }
 
-function initLocation() {
-  onCountryChange();
-}
-
+// ═══════════════════════════════════════════
+// Location Cascading
+// ═══════════════════════════════════════════
 function onCountryChange() {
   const country = document.getElementById('country').value;
-  const provGroup = document.getElementById('province-group');
   const provSel = document.getElementById('province');
   const citySel = document.getElementById('city');
+  const distSel = document.getElementById('district');
   const data = CITY_DATA[country];
 
-  provSel.innerHTML = '';
-  citySel.innerHTML = '';
+  provSel.innerHTML = '<option value="">省份</option>';
+  citySel.innerHTML = '<option value="">城市</option>';
+  distSel.innerHTML = '<option value="">区县</option>';
 
   if (!data) return;
-
   const provinces = Object.keys(data.provinces);
-  if (provinces.length <= 1 && Object.keys(data.provinces[provinces[0]].cities).length <= 1) {
-    provGroup.style.display = 'none';
-    const city = Object.keys(data.provinces[provinces[0]].cities)[0];
-    citySel.innerHTML = `<option value="${city}">${city}</option>`;
-  } else {
-    provGroup.style.display = 'block';
-    for (const p of provinces) {
-      provSel.innerHTML += `<option value="${p}">${p}</option>`;
-    }
-    onProvinceChange();
+  for (const p of provinces) {
+    provSel.innerHTML += `<option value="${p}">${p}</option>`;
   }
 }
 
@@ -566,34 +628,63 @@ function onProvinceChange() {
   const country = document.getElementById('country').value;
   const province = document.getElementById('province').value;
   const citySel = document.getElementById('city');
+  const distSel = document.getElementById('district');
   const data = CITY_DATA[country];
-  if (!data) return;
+
+  citySel.innerHTML = '<option value="">城市</option>';
+  distSel.innerHTML = '<option value="">区县</option>';
+  if (!data || !province) return;
 
   const cities = data.provinces[province]?.cities || {};
-  citySel.innerHTML = '';
-  for (const [name, coords] of Object.entries(cities)) {
-    citySel.innerHTML += `<option value="${coords[0]},${coords[1]}">${name}</option>`;
+  for (const [name, info] of Object.entries(cities)) {
+    citySel.innerHTML += `<option value="${name}">${name}</option>`;
+  }
+}
+
+function onCityChange() {
+  const country = document.getElementById('country').value;
+  const province = document.getElementById('province').value;
+  const city = document.getElementById('city').value;
+  const distSel = document.getElementById('district');
+  const data = CITY_DATA[country];
+
+  distSel.innerHTML = '<option value="">区县</option>';
+  if (!data || !province || !city) return;
+
+  const districts = data.provinces[province]?.cities[city]?.districts || [];
+  for (const d of districts) {
+    distSel.innerHTML += `<option value="${d}">${d}</option>`;
   }
 }
 
 function getCoords() {
   const country = document.getElementById('country').value;
+  const province = document.getElementById('province').value;
+  const city = document.getElementById('city').value;
   const data = CITY_DATA[country];
   const tz = data?.tz || 8;
 
-  const cityVal = document.getElementById('city').value;
-  if (cityVal.includes(',')) {
-    const [lon, lat] = cityVal.split(',').map(parseFloat);
-    return { lon, lat, tz };
+  if (data && province && city) {
+    const cityData = data.provinces[province]?.cities[city];
+    if (cityData?.coords) {
+      return { lon: cityData.coords[0], lat: cityData.coords[1], tz, cityName: city, provinceName: province };
+    }
   }
-  return { lon: 116.4074, lat: 39.9042, tz: 8 };
+  return { lon: 116.4074, lat: 39.9042, tz: 8, cityName: '北京', provinceName: '北京' };
 }
 
-// ─── State & Navigation ───
+function initLocation() {
+  onCountryChange();
+}
+
+// ═══════════════════════════════════════════
+// State & Navigation (with sessionStorage)
+// ═══════════════════════════════════════════
 let chartData = null;
 let sessionId = generateUUID();
 let chatHistory = [];
 let detailMode = false;
+let activeTab = 'talent';
 
 function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
@@ -602,31 +693,114 @@ function generateUUID() {
   });
 }
 
+// Save/restore state
+function saveState() {
+  if (!chartData) return;
+  const state = {
+    chartData, sessionId, chatHistory, detailMode, activeTab,
+    formValues: {
+      year: document.getElementById('birth-year').value,
+      month: document.getElementById('birth-month').value,
+      day: document.getElementById('birth-day').value,
+      time: document.getElementById('birth-time').value,
+      country: document.getElementById('country').value,
+      province: document.getElementById('province').value,
+      city: document.getElementById('city').value,
+      district: document.getElementById('district').value,
+      gender: document.getElementById('gender').value,
+    }
+  };
+  try { sessionStorage.setItem('explore_state', JSON.stringify(state)); } catch(e) {}
+}
+
+function restoreState() {
+  try {
+    const raw = sessionStorage.getItem('explore_state');
+    if (!raw) return false;
+    const state = JSON.parse(raw);
+    chartData = state.chartData;
+    sessionId = state.sessionId;
+    chatHistory = state.chatHistory || [];
+    detailMode = state.detailMode || false;
+    activeTab = state.activeTab || 'talent';
+    if (state.formValues) {
+      const fv = state.formValues;
+      if (fv.year) document.getElementById('birth-year').value = fv.year;
+      if (fv.month) document.getElementById('birth-month').value = fv.month;
+      if (fv.day) document.getElementById('birth-day').value = fv.day;
+      if (fv.time) document.getElementById('birth-time').value = fv.time;
+      if (fv.gender) document.getElementById('gender').value = fv.gender;
+      if (fv.country) document.getElementById('country').value = fv.country;
+      onCountryChange();
+      setTimeout(() => {
+        if (fv.province) document.getElementById('province').value = fv.province;
+        onProvinceChange();
+        setTimeout(() => {
+          if (fv.city) document.getElementById('city').value = fv.city;
+          onCityChange();
+          setTimeout(() => {
+            if (fv.district) document.getElementById('district').value = fv.district;
+          }, 50);
+        }, 50);
+      }, 50);
+    }
+    return true;
+  } catch(e) { return false; }
+}
+
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  if (id === 'screen-chat') scrollChatBottom();
+  if (id === 'screen-chat') {
+    restoreChatMessages();
+    scrollChatBottom();
+    switchTab(activeTab);
+  }
+  if (id === 'screen-portrait' && chartData) {
+    renderPortrait(chartData);
+  }
 }
 
-// ─── Chart Generation ──
+function backToInput() {
+  saveState();
+  showScreen('screen-input');
+}
+
+function backToPortrait() {
+  saveState();
+  if (chartData) {
+    showScreen('screen-portrait');
+  } else {
+    showScreen('screen-input');
+  }
+}
+
+// ═══════════════════════════════════════════
+// Chart Generation
+// ═══════════════════════════════════════════
 async function generateChart() {
+  const y = parseInt(document.getElementById('birth-year').value);
+  const m = parseInt(document.getElementById('birth-month').value);
+  const d = parseInt(document.getElementById('birth-day').value);
+
+  if (!y || !m || !d) {
+    alert('请选择完整的出生日期');
+    return;
+  }
+
   const btn = document.getElementById('btn-generate');
   btn.disabled = true;
   btn.textContent = '计算中...';
 
-  const y = parseInt(document.getElementById('birth-year').value);
-  const m = parseInt(document.getElementById('birth-month').value);
-  const d = parseInt(document.getElementById('birth-day').value);
   const birthDate = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-
   const coords = getCoords();
 
   const payload = {
     birth_date: birthDate,
-    birth_time: document.getElementById('birth-time').value,
+    birth_time: document.getElementById('birth-time').value || '12:00',
     longitude: coords.lon,
     latitude: coords.lat,
-    gender: document.getElementById('gender').value,
+    gender: document.getElementById('gender').value || 'male',
     timezone_offset: coords.tz,
   };
 
@@ -644,8 +818,11 @@ async function generateChart() {
 
     chartData = await resp.json();
     detailMode = false;
+    chatHistory = [];
+    sessionId = generateUUID();
     showScreen('screen-portrait');
     renderPortrait(chartData);
+    saveState();
   } catch (e) {
     alert('计算失败: ' + e.message);
     btn.disabled = false;
@@ -653,7 +830,9 @@ async function generateChart() {
   }
 }
 
-// ─── Render Portrait ──
+// ═══════════════════════════════════════════
+// Render Portrait (with visual charts)
+// ═══════════════════════════════════════════
 function renderPortrait(data) {
   const chart = data.chart || {};
   const bazi = data.bazi || {};
@@ -665,12 +844,13 @@ function renderPortrait(data) {
   const mc = chart.midheaven || {};
   const pillars = bazi.pillars || [];
   const tagline = chart.portrait_tagline || '';
+  const elemDist = chart.element_distribution || {};
 
   document.getElementById('portrait-date').textContent =
-    document.getElementById('birth-year').value + '-' +
-    document.getElementById('birth-month').value + '-' +
-    document.getElementById('birth-day').value + ' · ' +
-    document.getElementById('birth-time').value;
+    (document.getElementById('birth-year').value || '--') + '-' +
+    (document.getElementById('birth-month').value || '--') + '-' +
+    (document.getElementById('birth-day').value || '--') + ' · ' +
+    (document.getElementById('birth-time').value || '12:00');
 
   let html = '';
 
@@ -682,55 +862,77 @@ function renderPortrait(data) {
 
   // Toggle
   html += `<div class="toggle-row">
-    <span class="toggle-label ${detailMode ? '' : 'active'}">精简</span>
+    <span class="toggle-label ${detailMode ? '' : 'active'}" onclick="setDetailMode(false)">精简</span>
     <div class="toggle-switch ${detailMode ? 'on' : ''}" onclick="toggleDetail()"></div>
-    <span class="toggle-label ${detailMode ? 'active' : ''}">详细</span>
+    <span class="toggle-label ${detailMode ? 'active' : ''}" onclick="setDetailMode(true)">详细</span>
   </div>`;
 
   if (detailMode) {
-    // Detailed cards
+    // ── Detailed View ──
     html += `<div class="portrait-cards">`;
 
+    // Planet table
     html += `<div class="pcard">
-      <div class="pcard-head"><div class="pcard-icon">✨</div><div class="pcard-title">星盘</div></div>
+      <div class="pcard-head"><div class="pcard-icon">✨</div><div class="pcard-title">行星位置</div></div>
       <div class="pcard-content">
-        太阳 <span>${sun.sign||'-'} ${sun.degree_in_sign||''}°</span> ·
-        月亮 <span>${moon.sign||'-'} ${moon.degree_in_sign||''}°</span><br>
-        上升 <span>${asc.sign||'-'} ${asc.degree||''}°</span> ·
-        天顶 <span>${mc.sign||'-'} ${mc.degree||''}°</span><br>
-        元素：<span>${chart.dominant_element||'-'}</span>（火${(chart.element_distribution||{}).火||0} 土${(chart.element_distribution||{}).土||0} 风${(chart.element_distribution||{}).风||0} 水${(chart.element_distribution||{}).水||0}）<br>`;
-
-    // Planets
+      <table class="data-table"><tr><th>行星</th><th>星座</th><th>度数</th><th>元素</th><th>状态</th></tr>`;
     const orderedPlanets = ['太阳','月球','水星','金星','火星','木星','土星','天王星','海王星','冥王星'];
     for (const name of orderedPlanets) {
       const p = planets.find(x => x.name_cn === name);
       if (p) {
-        html += `${p.symbol}${p.name_cn} <span>${p.sign}${p.degree_in_sign}°</span>${p.retrograde?' ℞':''} · `;
+        html += `<tr><td>${p.symbol} ${p.name_cn}</td><td class="hi">${p.sign}</td><td>${p.degree_in_sign}°</td><td>${p.element||'-'}</td><td>${p.retrograde ? '<span class="retro-tag">逆行 ℞</span>' : '顺行'}</td></tr>`;
       }
     }
-    html += `<br>相位：${(chart.aspects||[]).slice(0,4).map(a => a.planet1+' '+a.aspect+' '+a.planet2).join(' · ') || '无主要相位'}</div></div>`;
+    html += `<tr><td>Asc</td><td class="hi">${asc.sign||'-'}</td><td>${asc.degree||''}°</td><td colspan="2">上升点</td></tr>`;
+    html += `<tr><td>MC</td><td class="hi">${mc.sign||'-'}</td><td>${mc.degree||''}°</td><td colspan="2">天顶</td></tr>`;
+    html += `</table></div></div>`;
 
-    html += `<div class="pcard">
-      <div class="pcard-head"><div class="pcard-icon">🔮</div><div class="pcard-title">八字</div></div>
-      <div class="pcard-content">
-        日主：<span>${bazi.day_master||'-'}（${bazi.day_master_element||'-'}·${bazi.day_master_yin_yang||'-'}）</span><br>`;
-    if (pillars.length >= 4) {
-      html += `四柱：<span>${pillars[0].stem}${pillars[0].branch}</span> · <span>${pillars[1].stem}${pillars[1].branch}</span> · <span>${pillars[2].stem}${pillars[2].branch}</span> · <span>${pillars[3].stem}${pillars[3].branch}</span><br>`;
-      html += `纳音：${(bazi.nayin||[]).join(' · ')}<br>`;
+    // Aspect grid
+    const aspects = chart.aspects || [];
+    if (aspects.length > 0) {
+      html += `<div class="pcard">
+        <div class="pcard-head"><div class="pcard-icon">🔗</div><div class="pcard-title">主要相位</div></div>
+        <div class="pcard-content"><div class="aspect-grid">`;
+      for (const a of aspects.slice(0, 12)) {
+        const isMajor = a.aspect === '合相' || a.aspect === '对分相' || a.aspect === '四分相' || a.aspect === '三分相';
+        html += `<div class="aspect-cell${isMajor ? ' major' : ''}">${a.planet1}<br>${a.aspect}<br>${a.planet2}</div>`;
+      }
+      html += `</div></div></div>`;
     }
-    html += `十神：${Object.entries(bazi.ten_gods||{}).map(([k,v]) => k+':'+v).join(' ')}<br>`;
-    html += `日主：<span>${bazi.day_master_strength||'-'}</span> · 生肖：<span>${bazi.zodiac||'-'}</span> · 起运：<span>${bazi.luck_direction||'-'}</span></div></div>`;
 
+    // Bazi table
+    html += `<div class="pcard">
+      <div class="pcard-head"><div class="pcard-icon">🔮</div><div class="pcard-title">八字四柱</div></div>
+      <div class="pcard-content">
+      <table class="data-table"><tr><th>柱</th><th>干支</th><th>五行</th><th>藏干</th><th>纳音</th></tr>`;
+    if (pillars.length >= 4) {
+      for (let i = 0; i < pillars.length; i++) {
+        const p = pillars[i];
+        html += `<tr><td>${p.name}</td><td class="hi">${p.stem}${p.branch}</td><td>${p.element}</td><td>${p.hidden_stem||'-'}</td><td>${(bazi.nayin||[])[i]||'-'}</td></tr>`;
+      }
+    }
+    html += `</table>
+    <div style="margin-top:8px;font-size:12px;">
+      日主：<span>${bazi.day_master||'-'}（${bazi.day_master_element||'-'}·${bazi.day_master_yin_yang||'-'}）</span> ·
+      十神：${Object.entries(bazi.ten_gods||{}).map(([k,v]) => '<span>'+k+':'+v+'</span>').join(' ')}<br>
+      日主：<span>${bazi.day_master_strength||'-'}</span> · 生肖：<span>${bazi.zodiac||'-'}</span> · 起运：<span>${bazi.luck_direction||'-'}</span>
+    </div></div></div>`;
+
+    // Star mansion
     html += `<div class="pcard">
       <div class="pcard-head"><div class="pcard-icon">🌙</div><div class="pcard-title">星宿</div></div>
       <div class="pcard-content">
-        <span>${star.name||'-'}（${star.element||'-'}·${star.direction||'-'}方·${star.animal||'-'}）</span><br>
-        ${star.personality||'-'}<br>农历：${data.lunar_date||'-'}</div></div>`;
+        <span>${star.name||'-'}</span>（${star.element||'-'}·${star.direction||'-'}方·${star.animal||'-'}）<br>
+        ${star.personality||'-'}<br>
+        ${star.moon_lon_mansion ? '月亮黄经校验：<span>'+star.moon_lon_mansion+'</span><br>' : ''}
+        农历：${data.lunar_date||'-'}</div></div>`;
 
     html += `</div>`;
   } else {
-    // Simplified
+    // ── Simplified View ──
     html += `<div class="portrait-cards">`;
+
+    // Core config card
     html += `<div class="pcard">
       <div class="pcard-head"><div class="pcard-icon">✨</div><div class="pcard-title">核心配置</div></div>
       <div class="pcard-content">
@@ -741,23 +943,120 @@ function renderPortrait(data) {
         星宿 <span>${star.name||'-'}</span> ·
         生肖 <span>${bazi.zodiac||'-'}</span>
       </div></div>`;
+
+    // Element distribution donut
+    html += `<div class="pcard">
+      <div class="pcard-head"><div class="pcard-icon">🎨</div><div class="pcard-title">元素分布</div></div>
+      <div class="pcard-content">
+      ${buildDonutChart(elemDist)}
+      </div></div>`;
+
     html += `</div>`;
   }
 
   html += `<button class="btn btn-primary" onclick="startChat()">✦ 开始 AI 深度分析</button>`;
-  html += `<button class="btn-back" onclick="showScreen('screen-input')">← 返回修改信息</button>`;
+  html += `<button class="btn-back" onclick="backToInput()">← 返回修改信息</button>`;
 
   document.getElementById('portrait-content').innerHTML = html;
+}
+
+function buildDonutChart(elemDist) {
+  const elements = [
+    { name: '火', val: elemDist['火'] || 0, color: '#d4786e' },
+    { name: '土', val: elemDist['土'] || 0, color: '#c39b73' },
+    { name: '风', val: elemDist['风'] || 0, color: '#7d96be' },
+    { name: '水', val: elemDist['水'] || 0, color: '#82aa87' },
+  ];
+  const total = elements.reduce((s, e) => s + e.val, 0) || 1;
+
+  // Simple SVG donut
+  const cx = 50, cy = 50, r = 36, sw = 14;
+  let html = `<div class="donut-wrap">
+    <svg class="donut-svg" width="100" height="100" viewBox="0 0 100 100">`;
+  let offset = -90;
+  for (const el of elements) {
+    if (el.val === 0) continue;
+    const pct = el.val / total;
+    const dashLen = 2 * Math.PI * r * pct;
+    const dashGap = 2 * Math.PI * r - dashLen;
+    html += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${el.color}" stroke-width="${sw}"
+      stroke-dasharray="${dashLen} ${dashGap}" stroke-linecap="round"
+      transform="rotate(${offset} ${cx} ${cy})" />`;
+    offset += pct * 360;
+  }
+  html += `<text x="${cx}" y="${cy-5}" text-anchor="middle" fill="#ece5d5" font-size="14" font-weight="700">${total}</text>`;
+  html += `<text x="${cx}" y="${cy+12}" text-anchor="middle" fill="rgba(236,229,213,0.5)" font-size="9">行星数</text>`;
+  html += `</svg><div class="donut-legend">`;
+  for (const el of elements) {
+    html += `<div class="donut-legend-item"><div class="donut-dot" style="background:${el.color}"></div>${el.name}：${el.val}颗</div>`;
+  }
+  html += `</div></div>`;
+  return html;
 }
 
 function toggleDetail() {
   detailMode = !detailMode;
   renderPortrait(chartData);
+  saveState();
 }
 
-// ─── Chat ──
+function setDetailMode(mode) {
+  if (detailMode !== mode) {
+    detailMode = mode;
+    renderPortrait(chartData);
+    saveState();
+  }
+}
+
+// ═══════════════════════════════════════════
+// Chat
+// ═══════════════════════════════════════════
 function startChat() {
   showScreen('screen-chat');
+  switchTab(activeTab);
+  saveState();
+}
+
+// Tab questions
+const TAB_QUESTIONS = {
+  talent: [
+    '我更适合打工还是创业？',
+    '我更适合与人合作还是单干？',
+    '我最大的隐藏优势是什么？',
+    '哪些能力是我自己没意识到的？',
+    '我的创造力和执行力哪个更强？',
+  ],
+  relation: [
+    '我和亲人相处需要注意哪些问题？',
+    '我和同事相处需要注意哪些问题？',
+    '我和恋人相处需要注意哪些问题？',
+    '什么样的恋人更加适配我？',
+    '我在人际关系中容易踩什么坑？',
+  ],
+  direction: [
+    '我适合的行业以及具体的岗位有哪些？',
+    '当前阶段我应该聚焦什么方向？',
+    '我该如何突破目前的瓶颈？',
+    '未来3年我的关键节点是什么？',
+    '什么样的工作节奏最适合我？',
+  ]
+};
+
+function switchTab(tabName) {
+  activeTab = tabName;
+  document.querySelectorAll('#question-tabs .tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === tabName);
+  });
+  const container = document.getElementById('sub-questions');
+  const questions = TAB_QUESTIONS[tabName] || [];
+  container.innerHTML = questions.map(q =>
+    `<button class="sub-q-btn" onclick="sendQuick('${q.replace(/'/g, "\\'")}')">${q}</button>`
+  ).join('');
+}
+
+function sendQuick(msg) {
+  document.getElementById('chat-input').value = msg;
+  sendMessage(msg);
 }
 
 async function sendMessage(msg) {
@@ -768,6 +1067,7 @@ async function sendMessage(msg) {
 
   addMessage('user', message);
   chatHistory.push({ role: 'user', content: message });
+  saveState();
 
   const typingId = addTypingIndicator();
 
@@ -821,6 +1121,7 @@ async function sendMessage(msg) {
 
     if (fullContent) {
       chatHistory.push({ role: 'assistant', content: fullContent });
+      saveState();
     } else {
       removeMessage(assistantId);
       await fallbackNonStream(message);
@@ -847,6 +1148,7 @@ async function fallbackNonStream(message) {
     if (data.reply) {
       addMessage('assistant', data.reply);
       chatHistory.push({ role: 'assistant', content: data.reply });
+      saveState();
     } else {
       addMessage('assistant', '请求失败：' + (data.error || '未知错误'));
     }
@@ -855,12 +1157,9 @@ async function fallbackNonStream(message) {
   }
 }
 
-function sendQuick(msg) {
-  document.getElementById('chat-input').value = msg;
-  sendMessage(msg);
-}
-
-// ─── Message UI ──
+// ═══════════════════════════════════════════
+// Message UI
+// ═══════════════════════════════════════════
 let msgCounter = 0;
 
 function addMessage(role, content) {
@@ -897,18 +1196,116 @@ function scrollChatBottom() {
   if (container) setTimeout(() => { container.scrollTop = container.scrollHeight; }, 50);
 }
 
-function formatMarkdown(text) {
-  if (!text) return '';
-  return text
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/## (.+)/g, '<br><strong style="font-size:16px">$1</strong><br>')
-    .replace(/\n/g, '<br>');
+function restoreChatMessages() {
+  const container = document.getElementById('chat-messages');
+  container.innerHTML = '';
+  msgCounter = 0;
+
+  if (chatHistory.length === 0) {
+    container.innerHTML = `<div class="msg assistant">
+      <div class="msg-avatar">✦</div>
+      <div class="msg-bubble">我已根据你的信息完成了综合分析。你可以直接问我问题，也可以点击上面的快捷问题开始。</div>
+    </div>`;
+    return;
+  }
+
+  for (const msg of chatHistory) {
+    addMessage(msg.role, msg.content);
+  }
 }
 
-// ─── Bootstrap ──
+// Enhanced markdown with table support
+function formatMarkdown(text) {
+  if (!text) return '';
+
+  // Escape HTML first
+  let html = text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  // Render markdown tables (| col | col | → <table>)
+  html = renderTables(html);
+
+  // Bold
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+  // Headers
+  html = html.replace(/### (.+)/g, '<br><strong style="font-size:14px;color:var(--gold)">$1</strong><br>');
+  html = html.replace(/## (.+)/g, '<br><strong style="font-size:16px">$1</strong><br>');
+
+  // Newlines
+  html = html.replace(/\n/g, '<br>');
+
+  return html;
+}
+
+function renderTables(html) {
+  // Detect markdown table pattern: lines with | col | col |
+  const lines = html.split('\n');
+  let result = [];
+  let inTable = false;
+  let tableLines = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    const isTableLine = line.startsWith('|') && line.endsWith('|');
+    const isSeparator = /^\|[\s\-:|]+\|$/.test(line);
+
+    if (isTableLine && !isSeparator) {
+      if (!inTable) {
+        inTable = true;
+        tableLines = [];
+      }
+      tableLines.push(line);
+    } else if (isSeparator && inTable) {
+      // skip separator
+      continue;
+    } else {
+      if (inTable && tableLines.length > 0) {
+        result.push(buildTable(tableLines));
+        tableLines = [];
+        inTable = false;
+      }
+      result.push(line);
+    }
+  }
+  if (inTable && tableLines.length > 0) {
+    result.push(buildTable(tableLines));
+  }
+
+  return result.join('\n');
+}
+
+function buildTable(lines) {
+  if (lines.length === 0) return '';
+  let tableHtml = '<table>';
+  // First line is header
+  const headerCells = lines[0].split('|').filter(c => c.trim() !== '');
+  tableHtml += '<thead><tr>' + headerCells.map(c => `<th>${c.trim()}</th>`).join('') + '</tr></thead>';
+
+  if (lines.length > 1) {
+    tableHtml += '<tbody>';
+    for (let i = 1; i < lines.length; i++) {
+      const cells = lines[i].split('|').filter(c => c.trim() !== '');
+      tableHtml += '<tr>' + cells.map(c => `<td>${c.trim()}</td>`).join('') + '</tr>';
+    }
+    tableHtml += '</tbody>';
+  }
+  tableHtml += '</table>';
+  return tableHtml;
+}
+
+// ═══════════════════════════════════════════
+// Bootstrap
+// ═══════════════════════════════════════════
 initDateSelects();
 initLocation();
+
+// Restore state if user returns to page
+if (restoreState()) {
+  if (chartData) {
+    showScreen('screen-portrait');
+  }
+}
 </script>
 </body>
 </html>
