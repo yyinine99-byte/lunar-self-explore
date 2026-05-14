@@ -950,7 +950,7 @@ function initLocation() {
 }
 
 // ═══════════════════════════════════════════
-// State & Navigation (with sessionStorage)
+// State & Navigation (localStorage, 3天过期)
 // ═══════════════════════════════════════════
 let chartData = null;
 let sessionId = generateUUID();
@@ -971,6 +971,7 @@ function saveState() {
   if (!chartData) return;
   const state = {
     chartData, sessionId, chatHistory, detailMode, chatMode, activeTab,
+    savedAt: Date.now(),
     formValues: {
       year: document.getElementById('birth-year').value,
       month: document.getElementById('birth-month').value,
@@ -983,14 +984,24 @@ function saveState() {
       gender: document.getElementById('gender').value,
     }
   };
-  try { sessionStorage.setItem('explore_state', JSON.stringify(state)); } catch(e) {}
+  try { localStorage.setItem('explore_state', JSON.stringify(state)); } catch(e) {}
 }
+
+const STORAGE_KEY = 'explore_state';
+const STORAGE_TTL = 3 * 24 * 60 * 60 * 1000; // 3天过期
 
 function restoreState() {
   try {
-    const raw = sessionStorage.getItem('explore_state');
+    const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return false;
     const state = JSON.parse(raw);
+
+    // 3天过期检查
+    if (state.savedAt && Date.now() - state.savedAt > STORAGE_TTL) {
+      localStorage.removeItem(STORAGE_KEY);
+      return false;
+    }
+
     chartData = state.chartData;
     sessionId = state.sessionId;
     chatHistory = state.chatHistory || [];
@@ -1038,6 +1049,23 @@ function showScreen(id) {
 function backToInput() {
   saveState();
   showScreen('screen-input');
+}
+
+function newChart() {
+  // 清空旧数据，开始新画像
+  chartData = null;
+  chatHistory = [];
+  sessionId = generateUUID();
+  localStorage.removeItem(STORAGE_KEY);
+  showScreen('screen-input');
+  // 重置表单
+  document.getElementById('birth-year').value = '';
+  document.getElementById('birth-month').value = '';
+  document.getElementById('birth-day').value = '';
+  document.getElementById('birth-time').value = '12:00';
+  document.getElementById('country').value = '中国';
+  document.getElementById('gender').value = '';
+  onCountryChange();
 }
 
 function backToPortrait() {
@@ -1250,7 +1278,10 @@ function renderPortrait(data) {
   </div>`;
 
   html += `<button class="btn btn-primary" onclick="startChat()">✦ 开始 AI 深度分析</button>`;
-  html += `<button class="btn-back" onclick="backToInput()">← 返回修改信息</button>`;
+  html += `<div style="display:flex;gap:8px;margin-top:8px;">
+    <button class="btn-back" style="flex:1" onclick="backToInput()">修改信息</button>
+    <button class="btn-back" style="flex:1" onclick="newChart()">新建画像</button>
+  </div>`;
 
   document.getElementById('portrait-content').innerHTML = html;
 }
