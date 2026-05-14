@@ -139,9 +139,11 @@ def compute_month_pillar(dt: datetime.date, year_stem: int) -> Tuple[int, int]:
             month_branch = 1  # 丑月
 
     # 月干 = (年干对应起始 + 月地支偏移) % 10
+    # 月地支偏移以寅(=2)为起点，子(0)丑(1)需要环绕到10和11
     month_stem_starts = [2, 4, 6, 8, 0]  # 丙=2, 戊=4, 庚=6, 壬=8, 甲=0
     group = year_stem % 5
-    month_stem = (month_stem_starts[group] + (month_branch - 2)) % 10
+    month_offset = (month_branch - 2) % 12  # 子(0)→10, 丑(1)→11, 寅(2)→0
+    month_stem = (month_stem_starts[group] + month_offset) % 10
     return month_stem, month_branch
 
 
