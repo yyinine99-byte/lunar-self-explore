@@ -77,7 +77,7 @@ def _load_ephemeris():
 
 def _get_sign(longitude: float) -> Tuple[int, str, str, float]:
     sign_idx = int(longitude // 30)
-    degree_in_sign = longitude % 30
+    degree_in_sign = float(longitude % 30)
     return sign_idx, ZODIAC_SIGNS[sign_idx], ZODIAC_SYMBOLS[sign_idx], round(degree_in_sign, 2)
 
 
@@ -126,18 +126,18 @@ def _compute_mc(lst_deg: float, obliquity: float) -> float:
 
 def _is_retrograde(location, t, body_obj, today_lon: float) -> bool:
     """判断行星是否逆行：比较前后两天的黄经变化。"""
-    t2 = t.ts.utc(t.utc[0], t.utc[1], t.utc[2],
-                   t.utc[3], t.utc[4], t.utc[5] + 86400)
+    t2 = t.ts.utc(int(t.utc[0]), int(t.utc[1]), int(t.utc[2]),
+                   int(t.utc[3]), int(t.utc[4]), int(t.utc[5]) + 86400)
     astrometric2 = location.at(t2).observe(body_obj)
     _, lon2_deg, _ = astrometric2.frame_latlon(ecliptic_frame)
-    tomorrow_lon = lon2_deg.degrees % 360
+    tomorrow_lon = float(lon2_deg.degrees % 360)
 
     diff = tomorrow_lon - today_lon
     if diff > 180:
         diff -= 360
     elif diff < -180:
         diff += 360
-    return diff < 0
+    return bool(diff < 0)
 
 
 def _generate_portrait_tagline(sun_sign: str, moon_sign: str, asc_sign: str,
@@ -207,7 +207,7 @@ def compute_chart(birth_dt: datetime.datetime, lat: float, lon: float) -> Dict:
     for body_name, body_obj in _bodies.items():
         astrometric = location.at(t).observe(body_obj)
         lat_deg, lon_deg, distance = astrometric.frame_latlon(ecliptic_frame)
-        ecliptic_lon = lon_deg.degrees % 360
+        ecliptic_lon = float(lon_deg.degrees % 360)
 
         sign_idx, sign_name, sign_symbol, sign_deg = _get_sign(ecliptic_lon)
         retrograde = _is_retrograde(location, t, body_obj, ecliptic_lon)
