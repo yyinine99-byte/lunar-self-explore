@@ -48,6 +48,7 @@ class ChatRequest(BaseModel):
     message: str
     chart_data: dict
     history: Optional[list] = None
+    mode: str = "explore"  # "explore" | "answer"
 
 
 # ─── Routes ───────────────────────────────────────────────────
@@ -160,6 +161,7 @@ async def api_chat(request: Request, body: ChatRequest):
                 chart_data=body.chart_data,
                 user_message=body.message,
                 history=body.history,
+                mode=body.mode,
             ):
                 yield chunk
         except Exception as e:
@@ -197,6 +199,7 @@ async def api_chat_sync(request: Request, body: ChatRequest):
         chart_data=body.chart_data,
         user_message=body.message,
         history=body.history,
+        mode=body.mode,
     )
 
     if result["error"]:

@@ -22,7 +22,7 @@ DEEPSEEK_MODEL = "deepseek-chat"  # 成本最优，中文能力强
 # 也可以使用 OpenAI 兼容的第三方 API
 
 
-def build_messages(chart_data: dict, user_message: str, history: Optional[list] = None) -> list:
+def build_messages(chart_data: dict, user_message: str, history: Optional[list] = None, mode: str = "explore") -> list:
     """构建发送给 AI 的完整消息列表。
 
     将用户的出生信息计算结果嵌入到 system prompt 中，
@@ -32,6 +32,7 @@ def build_messages(chart_data: dict, user_message: str, history: Optional[list] 
         chart_data: 完整的计算结果（星盘+五行能量+星宿）
         user_message: 用户当前消息
         history: 之前的对话历史
+        mode: "explore" (探索模式) 或 "answer" (答案模式)
 
     Returns:
         messages 列表
@@ -80,6 +81,26 @@ def build_messages(chart_data: dict, user_message: str, history: Optional[list] 
     # 构建完整消息
     system_content = SYSTEM_PROMPT_FULL + "\n\n==== 用户个人信息（供参考）====\n" + "\n\n".join(context_blocks) + "\n\n==== 以上是用户的计算结果 ====\n请用这些信息辅助分析，但不要全部罗列出来。在用户问到时自然地引用相关数据。"
 
+    # 综合平衡指令
+    system_content += """
+\n## 综合分析法（重要）
+分析时必须综合星盘（西方占星）、五行能量（四柱）、星宿（二十八宿）三种体系，不要只依赖其中一种。
+- 当不同体系指向相似特质时，说明这个特质非常突出，可以重点展开
+- 当体系之间有矛盾时，指出矛盾并提出你的观察和判断
+- 三种体系的权重由你根据具体问题灵活判断，目标是构建一个尽量立体、具体的人像
+- 不要在每一句话里都平均分配三种体系，而是自然融合，让分析读起来像一个人在说话"""
+
+    # 模式指令
+    if mode == "answer":
+        system_content += """
+\n## 当前模式：答案模式 ⚡
+用户选择了答案模式，想要直接、干脆的回复。请遵守：
+- 直接给结论和建议，像朋友聊天一样直给，不要铺垫
+- 不要提星盘、五行能量、星宿的具体术语（如"你的太阳星座是XX""你的日主是XX""你的星宿是XX"）
+- 跳过推导和分析过程，只说你得出的判断和可操作的建议
+- 保持温暖但不啰嗦，每个要点三两句话就说清楚
+- 如果用户追问原因，可以简单补充，但仍保持直接"""
+
     messages = [{"role": "system", "content": system_content}]
 
     if history:
@@ -90,13 +111,14 @@ def build_messages(chart_data: dict, user_message: str, history: Optional[list] 
     return messages
 
 
-async def chat_stream(chart_data: dict, user_message: str, history: Optional[list] = None) -> AsyncGenerator[str, None]:
+async def chat_stream(chart_data: dict, user_message: str, history: Optional[list] = None, mode: str = "explore") -> AsyncGenerator[str, None]:
     """流式对话接口。
 
     Args:
         chart_data: 画像数据
         user_message: 用户消息
         history: 历史消息
+        mode: "explore" | "answer"
 
     Yields:
         SSE 格式的流式响应片段
@@ -105,7 +127,7 @@ async def chat_stream(chart_data: dict, user_message: str, history: Optional[lis
         yield "data: {\"error\": \"API Key 未配置，请联系管理员。\"}\n\n"
         return
 
-    messages = build_messages(chart_data, user_message, history)
+    messages = build_messages(chart_data, user_message, history, mode)
 
     async with httpx.AsyncClient(timeout=60.0) as client:
         async with client.stream(
@@ -138,7 +160,7 @@ async def chat_stream(chart_data: dict, user_message: str, history: Optional[lis
                     yield f"data: {data}\n\n"
 
 
-async def chat_non_stream(chart_data: dict, user_message: str, history: Optional[list] = None) -> dict:
+async def chat_non_stream(chart_data: dict, user_message: str, history: Optional[list] = None, mode: str = "explore") -> dict:
     """非流式对话接口（备用）。
 
     Returns:
@@ -147,7 +169,7 @@ async def chat_non_stream(chart_data: dict, user_message: str, history: Optional
     if not DEEPSEEK_API_KEY:
         return {"reply": "", "error": "API Key 未配置，请联系管理员。"}
 
-    messages = build_messages(chart_data, user_message, history)
+    messages = build_messages(chart_data, user_message, history, mode)
 
     async with httpx.AsyncClient(timeout=60.0) as client:
         response = await client.post(
