@@ -94,11 +94,13 @@ async def api_chart(request: Request, body: ChartRequest):
             lon=body.longitude,
         )
 
-        # 2. 计算八字
+        # 2. 计算八字 (含真太阳时校正)
         bazi_result = compute_bazi(
             birth_date=birth_date,
             birth_hour=birth_hour,
             gender=body.gender,
+            longitude=body.longitude,
+            timezone_offset=body.timezone_offset,
         )
 
         # 3. 计算农历日期 → 星宿（农历月法）
@@ -209,7 +211,71 @@ async def health_check():
     return {
         "status": "ok",
         "api_key_configured": bool(os.environ.get("DEEPSEEK_API_KEY", "")),
+        "image_api_configured": bool(os.environ.get("IMAGE_GEN_API_KEY", "")),
     }
+
+
+class ImageGenRequest(BaseModel):
+    prompt: str
+    size: str = "1024x1024"  # 可选: 512x512, 1024x1024
+
+
+@app.post("/api/image/generate")
+async def api_image_generate(request: Request, body: ImageGenRequest):
+    """图像生成接口（可选功能，需配置 IMAGE_GEN_API_KEY）。
+
+    支持 OpenAI 兼容的图像生成 API（如 DALL-E、Stability AI 等）。
+    如果未配置，返回提示信息。
+    """
+    client_ip = request.client.host if request.client else "unknown"
+    if not chat_limiter.allow(client_ip):
+        return JSONResponse(
+            status_code=429,
+            content={"error": "请求太频繁，请稍后再试"},
+        )
+
+    api_key = os.environ.get("IMAGE_GEN_API_KEY", "")
+    api_url = os.environ.get("IMAGE_GEN_API_URL", "https://api.openai.com/v1/images/generations")
+
+    if not api_key:
+        return JSONResponse(
+            status_code=503,
+            content={
+                "error": "图像生成服务暂未配置",
+                "hint": "设置 IMAGE_GEN_API_KEY 环境变量即可启用。支持 OpenAI/DALL-E 兼容的 API。",
+                "example": "在 Railway 后台添加环境变量: IMAGE_GEN_API_KEY=sk-xxx, IMAGE_GEN_API_URL=https://api.openai.com/v1/images/generations",
+            },
+        )
+
+    try:
+        import httpx
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            resp = await client.post(
+                api_url,
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": os.environ.get("IMAGE_GEN_MODEL", "dall-e-3"),
+                    "prompt": body.prompt,
+                    "n": 1,
+                    "size": body.size,
+                },
+            )
+
+            if resp.status_code != 200:
+                return JSONResponse(
+                    status_code=resp.status_code,
+                    content={"error": f"图像生成失败: {resp.text}"},
+                )
+
+            data = resp.json()
+            image_url = data.get("data", [{}])[0].get("url", "")
+            return JSONResponse(content={"image_url": image_url, "prompt": body.prompt})
+
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": f"图像生成失败: {str(e)}"})
 
 
 if __name__ == "__main__":

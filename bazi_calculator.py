@@ -197,21 +197,44 @@ def _get_nayin(cycle_index: int) -> str:
     return NAYIN_TABLE[cycle_index % 60]
 
 
-def compute_bazi(birth_date: datetime.date, birth_hour: int, gender: str = "") -> Dict:
+def _adjust_to_true_solar_time(birth_hour: float, longitude: float, timezone_offset: int) -> float:
+    """真太阳时校正。
+
+    北京时间 (UTC+8) 以 120°E 为基准。每偏西 1° 减 4 分钟。
+    例如大理 (100.27°E): 校正 = (100.27 - 120) × 4 ≈ -79 分钟。
+    18:00 北京时间 → 约 16:41 真太阳时 → 申时。
+
+    Returns:
+        校正后的小时数 (浮点, 用于确定时辰)
+    """
+    ref_meridian = timezone_offset * 15  # 时区基准经线
+    correction_min = (longitude - ref_meridian) * 4  # 分钟
+    return birth_hour + correction_min / 60.0
+
+
+def compute_bazi(birth_date: datetime.date, birth_hour: int, gender: str = "",
+                 longitude: float = 120.0, timezone_offset: int = 8) -> Dict:
     """计算完整八字。
 
     Args:
         birth_date: 公历出生日期
-        birth_hour: 出生小时 (0-23)
+        birth_hour: 出生小时 (0-23, 当地时间)
         gender: "male" / "female"
+        longitude: 出生地经度 (用于真太阳时校正)
+        timezone_offset: 时区偏移小时数 (用于真太阳时校正)
 
     Returns:
         八字信息字典
     """
+    # 真太阳时校正
+    true_solar_hour = _adjust_to_true_solar_time(
+        float(birth_hour), longitude, timezone_offset
+    )
+
     y_stem, y_branch = compute_year_pillar(birth_date.year, birth_date)
     d_stem, d_branch = compute_day_pillar(birth_date)
     m_stem, m_branch = compute_month_pillar(birth_date, y_stem)
-    h_stem, h_branch = compute_hour_pillar(birth_hour, d_stem)
+    h_stem, h_branch = compute_hour_pillar(int(true_solar_hour), d_stem)
 
     pillars = [
         {"name": "年柱", "stem": STEMS[y_stem], "branch": BRANCHES[y_branch],
@@ -255,6 +278,11 @@ def compute_bazi(birth_date: datetime.date, birth_hour: int, gender: str = "") -
                      _element_generates(BRANCH_ELEMENTS[m_branch])]
     day_master_strength = "得令" if month_supports else "失令"
 
+    # 真太阳时信息
+    solar_correction_min = (longitude - timezone_offset * 15) * 4
+    true_hour_int = int(true_solar_hour)
+    true_branch_idx = ((true_hour_int + 1) // 2) % 12
+
     return {
         "pillars": pillars,
         "day_master": day_master,
@@ -265,6 +293,13 @@ def compute_bazi(birth_date: datetime.date, birth_hour: int, gender: str = "") -
         "zodiac": ZODIAC[y_branch],
         "luck_direction": luck_direction,
         "day_master_strength": day_master_strength,
+        "true_solar_time": {
+            "original_hour": birth_hour,
+            "corrected_hour": round(true_solar_hour, 2),
+            "correction_minutes": round(solar_correction_min, 1),
+            "true_branch": BRANCHES[true_branch_idx],
+            "note": f"经度{longitude}°校正{solar_correction_min:+.0f}分钟" if abs(solar_correction_min) > 5 else "经度接近时区中线，几乎无需校正",
+        },
         "summary": f"日主{day_master}（{day_element}），" + "、".join(
             [f"{p['name']}: {p['stem']}{p['branch']}" for p in pillars]
         ),
