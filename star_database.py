@@ -180,90 +180,117 @@ RELATIONSHIP_MODES = {
     },
 }
 
-# 距离 → (关系类型, 距离等级) 映射
-def _get_relationship_by_distance(d: int) -> tuple:
-    """根据二十八宿圆周最短距离返回关系类型和等级。"""
-    mapping = {
-        0:  ("命之星", ""),
-        1:  ("业胎", ""),
-        2:  ("安坏", "近"),
-        3:  ("安坏", "远"),
-        4:  ("荣亲", "近"),
-        5:  ("荣亲", "远"),
-        6:  ("危成", "近"),
-        7:  ("危成", "远"),
-        8:  ("友衰", "近"),
-        9:  ("友衰", "远"),
-        10: ("安坏", "中"),
-        11: ("荣亲", "中"),
-        12: ("危成", "中"),
-        13: ("友衰", "中"),
-    }
-    # d=14 是圆周的正对面，归入中安坏
-    return mapping.get(d, ("安坏", "中"))
+# ═══════════════════════════════════════════
+# 距离 → 关系类型 + 等级 映射（修正版）
+# 验证：d=1近荣亲, d=6中安坏, d=7中友衰, d=14远危成
+# 规律：荣亲→安坏→友衰→危成 循环，第1次=近,第2次=中,第3次=远
+#       d=12/13=业胎, d=14=远危成(正对位)
+# ═══════════════════════════════════════════
+
+# 最短距离 → (关系类型, 等级)
+_DISTANCE_MAP = {
+    0:  ("命之星", ""),
+    1:  ("荣亲", "近"),
+    2:  ("安坏", "近"),
+    3:  ("友衰", "近"),
+    4:  ("危成", "近"),
+    5:  ("荣亲", "中"),
+    6:  ("安坏", "中"),
+    7:  ("友衰", "中"),
+    8:  ("危成", "中"),
+    9:  ("荣亲", "远"),
+    10: ("安坏", "远"),
+    11: ("友衰", "远"),
+    12: ("业胎", ""),
+    13: ("业胎", ""),
+    14: ("危成", "远"),
+}
+
+
+def _get_roles(rel_type: str, clockwise: int) -> tuple:
+    """返回 (role_a, role_b)，其中 A 是 clockwise 路径的起点。
+
+    规则：CW ≤ 14 时，A 为传统配对中的前一个角色（安/亲/衰/危/业），
+    荣亲、安坏、友衰中"前角色"偏向被动方，危成中"危"为主动方。
+    """
+    if rel_type == "安坏":
+        return ("安", "坏") if clockwise <= 14 else ("坏", "安")
+    elif rel_type == "友衰":
+        return ("衰", "友") if clockwise <= 14 else ("友", "衰")
+    elif rel_type == "荣亲":
+        return ("亲", "荣") if clockwise <= 14 else ("荣", "亲")
+    elif rel_type == "危成":
+        return ("危", "成") if clockwise <= 14 else ("成", "危")
+    elif rel_type == "业胎":
+        return ("业", "胎") if clockwise <= 14 else ("胎", "业")
+    return ("", "")
+
+
+# ═══════════════════════════════════════════
+# 28×28 硬编码关系查找表（模块加载时一次性生成）
+# ═══════════════════════════════════════════
+
+_RELATIONSHIP_TABLE: dict = {}  # key: (idx_a, idx_b), value: dict
+
+
+def _build_relationship_table():
+    """构建完整的 28×28 星宿关系查找表。"""
+    global _RELATIONSHIP_TABLE
+    if _RELATIONSHIP_TABLE:
+        return
+    for a in range(1, 29):
+        for b in range(1, 29):
+            if a == b:
+                rel_type, grade = "命之星", ""
+            else:
+                diff = abs(a - b)
+                d = min(diff, 28 - diff)
+                rel_type, grade = _DISTANCE_MAP[d]
+            clockwise = (b - a) % 28
+            role_a, role_b = _get_roles(rel_type, clockwise)
+            mode = RELATIONSHIP_MODES.get(rel_type, {})
+            label = f"{grade}{rel_type}" if grade else rel_type
+            _RELATIONSHIP_TABLE[(a, b)] = {
+                "type": rel_type,
+                "grade": grade,
+                "label": label,
+                "role_a": role_a,
+                "role_b": role_b,
+                "tag": mode.get("tag", ""),
+                "dynamic": mode.get("dynamic", ""),
+                "strength": mode.get("strength", ""),
+                "risk": mode.get("risk", ""),
+                "best_for": mode.get("best_for", ""),
+            }
+
+
+# 模块加载时构建
+_build_relationship_table()
 
 
 def get_relationship(mansion_idx_a: int, mansion_idx_b: int) -> dict:
-    """计算两个星宿之间的关系。
+    """查询两个星宿之间的关系（从 28×28 硬编码表直接读取）。
 
     Args:
         mansion_idx_a: 第一个星宿的索引 (1-28)
         mansion_idx_b: 第二个星宿的索引 (1-28)
 
     Returns:
-        包含关系类型、等级、互动模式描述的字典
+        包含关系类型、等级、角色、互动模式描述的字典
     """
-    if mansion_idx_a == mansion_idx_b:
-        rel_type, grade = "命之星", ""
-    else:
-        diff = abs(mansion_idx_a - mansion_idx_b)
-        d = min(diff, 28 - diff)
-        rel_type, grade = _get_relationship_by_distance(d)
-
-    # 判断安/坏、危/成、友/衰等角色
-    clockwise = (mansion_idx_b - mansion_idx_a) % 28
-    role_a, role_b = "", ""
-    if rel_type == "安坏":
-        role_a, role_b = ("坏", "安") if clockwise <= 14 else ("安", "坏")
-    elif rel_type == "危成":
-        role_a, role_b = ("危", "成") if clockwise <= 14 else ("成", "危")
-    elif rel_type == "友衰":
-        role_a, role_b = ("友", "衰") if clockwise <= 14 else ("衰", "友")
-    elif rel_type == "荣亲":
-        role_a, role_b = ("荣", "亲") if clockwise <= 14 else ("亲", "荣")
-    elif rel_type == "业胎":
-        role_a, role_b = ("胎", "业") if clockwise <= 14 else ("业", "胎")
-
-    mode = RELATIONSHIP_MODES.get(rel_type, {})
-    label = f"{grade}{rel_type}" if grade else rel_type
-
-    return {
-        "type": rel_type,
-        "grade": grade,
-        "label": label,
-        "role_a": role_a,
-        "role_b": role_b,
-        "tag": mode.get("tag", ""),
-        "dynamic": mode.get("dynamic", ""),
-        "strength": mode.get("strength", ""),
-        "risk": mode.get("risk", ""),
-        "best_for": mode.get("best_for", ""),
-    }
+    return _RELATIONSHIP_TABLE.get((mansion_idx_a, mansion_idx_b), {}).copy()
 
 
 def get_relationship_map(mansion_idx: int) -> list:
-    """获取某个星宿与全部 28 个星宿的关系地图（去重，只保留每种关系类型的最优代表）。"""
-    name = MANSION_NAMES[mansion_idx - 1] if 1 <= mansion_idx <= 28 else ""
-    my_data = MANSION_DATA.get(name, {})
-
-    # 找出每种关系类型+等级的组合的代表星宿
+    """获取某个星宿与全部 28 个星宿的关系地图（去重，每类关系只保留一个代表星宿）。"""
+    # 找出每种关系标签的代表星宿
     seen = set()
     relations = []
     for i in range(1, 29):
         if i == mansion_idx:
             continue
         rel = get_relationship(mansion_idx, i)
-        key = rel["label"]
+        key = rel.get("label", "")
         if key not in seen:
             seen.add(key)
             other_name = MANSION_NAMES[i - 1]
@@ -275,6 +302,6 @@ def get_relationship_map(mansion_idx: int) -> list:
 
     # 按关系类型分组排序：业胎 > 安坏 > 荣亲 > 危成 > 友衰 > 命之星
     type_order = {"业胎": 0, "安坏": 1, "荣亲": 2, "危成": 3, "友衰": 4, "命之星": 5}
-    relations.sort(key=lambda r: (type_order.get(r["type"], 9), r["grade"]))
+    relations.sort(key=lambda r: (type_order.get(r.get("type", ""), 9), r.get("grade", "")))
 
     return relations

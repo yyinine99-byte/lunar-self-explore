@@ -153,7 +153,7 @@ def build_messages(chart_data: dict, user_message: str, history: Optional[list] 
                 for t, info in type_groups.items():
                     grades_str = '、'.join(info['grades'])
                     first_sentence = info['dynamic'].split('。')[0] if info['dynamic'] else ''
-                    rel_lines.append(f"  {t}：{grades_str}\n    → {info['tag']}——{first_sentence}\n    优势：{info['strength']}\n    风险：{info['risk']}")
+                    rel_lines.append(f"  {info['tag']}型——{first_sentence}\n    代表星宿：{grades_str}\n    优势：{info['strength']}\n    风险：{info['risk']}")
             except Exception:
                 pass
 
@@ -173,9 +173,17 @@ def build_messages(chart_data: dict, user_message: str, history: Optional[list] 
 \n## 当前模式：答案模式 ⚡
 - 直接给结论，不要铺垫和推导过程，像朋友聊天一样直给
 - 三维综合分析原则不变——三个体系的数据自己在内部交叉比对，但输出时只呈现结论，不展示比对过程
-- 不提及星盘/八字/星宿术语（如"你的太阳星座""你的日主"），用生活化语言表达
-- 如果用户追问原因，简单补充，保持直接
-- 绝对优先级例外极少使用：仅当问题明确只涉及单一体系的概念解释时才可只用一维"""
+- 禁止使用星宿关系类型名称（安坏/荣亲/危成/友衰/业胎/命之星），用生活化描述替代；日主天干（如辛金/甲木）、星座名、行星名可自然提及，但不要用「日主」「十神」等学术框架词汇
+- 星宿关系→生活化表达的参考方向（根据语境灵活运用）：
+  · 安坏→深刻拉扯、相爱相杀、火山般的吸引、让你又爱又痛
+  · 荣亲→像家人一样安稳、相敬如宾、细水长流的踏实
+  · 危成→利益与感情的纠葛、一起做事比谈情更顺、互相成就
+  · 友衰→轻松自在但难落地、灵魂上的聊得来、像知己也像损友
+  · 业胎→说不清的羁绊、离不开的宿命感、最深的情感连接
+  · 命之星→像在照镜子、灵魂共振、另一个自己
+- 回答风格参考：「你的底层（辛金易碎）喜欢被捧着，加上（水瓶座）自由独立的特质，再加上（冥王4宫）深层的不安全感，所以你很容易被深刻拉扯、相爱相杀的关系吸引——但那个状态你可能并不舒服。日常相处里，你其实更需要能轻松交流、让你不设防的关系。」
+- 核心：用多个维度的特质共同解释一个情感模式，而不是分别介绍三个体系
+- 如果用户追问原因，简单补充，保持直接"""
 
     messages = [{"role": "system", "content": system_content}]
 
