@@ -90,21 +90,28 @@ def get_mansion_by_moon_longitude(moon_ecliptic_lon: float) -> dict:
     }
 
 
-def get_mansion_by_lunar_date(lunar_month: int, lunar_day: int, lunar_year: int = 2024) -> dict:
+def get_mansion_by_lunar_date(lunar_month: int, lunar_day: int, lunar_year: int = 2024, is_leap: bool = False) -> dict:
     """根据农历月日获取星宿信息（农历月固定起始宿法）。
 
     每个农历月有固定的起始星宿，月内按日递推。
     例如：正月起始为室宿，正月初十 = 井宿。
+    闰月：太阳实际已进入下一中气区域，使用下一月的起始宿。
+      例如：闰五月 → 使用六月的起始宿（井宿）计算。
 
     Args:
         lunar_month: 农历月 (1-12)
         lunar_day: 农历日 (1-30)
         lunar_year: 农历年（保留，未来可用于年修正）
+        is_leap: 是否为闰月
 
     Returns:
         包含星宿名和属性的字典
     """
-    start_idx = MONTH_START_MANSION.get(lunar_month, 0)
+    # 闰月处理：太阳已进入下一中气区域，使用下一月的起始宿
+    effective_month = lunar_month
+    if is_leap:
+        effective_month = lunar_month + 1 if lunar_month < 12 else 1
+    start_idx = MONTH_START_MANSION.get(effective_month, 0)
     mansion_idx = (start_idx + lunar_day - 1) % 28
     mansion_name = MANSION_NAMES[mansion_idx]
     data = MANSION_DATA.get(mansion_name, {})

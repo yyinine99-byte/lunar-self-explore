@@ -21,7 +21,28 @@ STEM_ELEMENTS = ["木", "木", "火", "火", "土", "土", "金", "金", "水", 
 STEM_YANG = [True, False, True, False, True, False, True, False, True, False]
 BRANCH_HIDDEN = ["癸", "己", "甲", "乙", "戊", "丙", "丁", "己", "庚", "辛", "戊", "壬"]
 BRANCH_ELEMENTS = ["水", "土", "木", "木", "土", "火", "火", "土", "金", "金", "土", "水"]
+BRANCH_YIN_YANG = [True, False, True, False, True, False, True, False, True, False, True, False]
 ZODIAC = ["鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"]
+
+# 完整的十二地支藏干表（主气、中气、余气）
+BRANCH_HIDDEN_STEMS_FULL = [
+    ["癸"],                 # 子
+    ["己", "癸", "辛"],      # 丑
+    ["甲", "丙", "戊"],      # 寅
+    ["乙"],                 # 卯
+    ["戊", "乙", "癸"],      # 辰
+    ["丙", "庚", "戊"],      # 巳
+    ["丁", "己"],           # 午
+    ["己", "丁", "乙"],      # 未
+    ["庚", "壬", "戊"],      # 申
+    ["辛"],                 # 酉
+    ["戊", "辛", "丁"],      # 戌
+    ["壬", "甲"],           # 亥
+]
+
+# 天干名 → 索引
+_STEM_IDX = {s: i for i, s in enumerate(STEMS)}
+ELEMENTS = ["木", "火", "土", "金", "水"]
 
 # 六十甲子纳音表 (60组完整，索引0=甲子, 1=乙丑, ..., 59=癸亥)
 NAYIN_TABLE = [
@@ -194,6 +215,176 @@ def get_ten_gods(day_stem: int, other_stem: int) -> str:
     return "未知"
 
 
+def get_ten_gods_for_branch(day_stem: int, branch_idx: int) -> str:
+    """计算地支十神（基于地支主气藏干）。"""
+    hidden_stem_name = BRANCH_HIDDEN[branch_idx]
+    hidden_stem_idx = _STEM_IDX[hidden_stem_name]
+    return get_ten_gods(day_stem, hidden_stem_idx)
+
+
+def _compute_day_master_strength(day_stem: int, day_branch: int, month_branch: int,
+                                  year_stem: int, year_branch: int,
+                                  month_stem: int, hour_stem: int, hour_branch: int) -> dict:
+    """综合日主强弱分析。
+
+    判断维度：
+    1. 月令：是否得月令生扶（权重最高）
+    2. 得地：日支是否比劫/印星
+    3. 得助：时支、年支是否有比劫/印星
+    4. 天干：其他三干的生克关系
+    5. 全局流通性：天干地支是否形成连续相生链
+
+    Returns:
+        {"level": "身强", "score": 72, "details": [...], "analysis": "..."}
+    """
+    de = STEM_ELEMENTS[day_stem]
+    elem_idx = ELEMENTS.index(de)
+    generated_by_idx = (elem_idx + 4) % 5  # 印星
+    controlled_by_idx = (elem_idx + 3) % 5  # 官杀
+    generates_idx = (elem_idx + 1) % 5      # 食伤
+    controls_idx = (elem_idx + 2) % 5       # 财星
+
+    score = 50
+    details = []
+
+    # ── 1. 月令（权重最高） ──
+    month_elem = BRANCH_ELEMENTS[month_branch]
+    month_elem_idx = ELEMENTS.index(month_elem)
+    if month_elem_idx == elem_idx:
+        score += 25
+        details.append(f"月令同气(+25)")
+    elif month_elem_idx == generated_by_idx:
+        score += 18
+        details.append(f"月令印星生扶(+18)")
+    elif month_elem_idx == controlled_by_idx:
+        score -= 20
+        details.append(f"月令官杀克身(-20)")
+    elif month_elem_idx == generates_idx:
+        score -= 10
+        details.append(f"月令食伤泄气(-10)")
+    elif month_elem_idx == controls_idx:
+        score -= 5
+        details.append(f"月令财星耗身(-5)")
+
+    # ── 2. 日支（得地） ──
+    day_br_elem = BRANCH_ELEMENTS[day_branch]
+    day_br_elem_idx = ELEMENTS.index(day_br_elem)
+    if day_br_elem_idx == elem_idx:
+        score += 12
+        details.append("日支比劫通根(+12)")
+    elif day_br_elem_idx == generated_by_idx:
+        score += 8
+        details.append("日支印星通根(+8)")
+
+    # ── 3. 时支 ──
+    hour_br_elem = BRANCH_ELEMENTS[hour_branch]
+    hour_br_elem_idx = ELEMENTS.index(hour_br_elem)
+    if hour_br_elem_idx == elem_idx:
+        score += 6
+        details.append("时支比劫(+6)")
+    elif hour_br_elem_idx == generated_by_idx:
+        score += 4
+        details.append("时支印星(+4)")
+
+    # ── 4. 年支 ──
+    year_br_elem = BRANCH_ELEMENTS[year_branch]
+    year_br_elem_idx = ELEMENTS.index(year_br_elem)
+    if year_br_elem_idx == elem_idx:
+        score += 4
+        details.append("年支比劫(+4)")
+    elif year_br_elem_idx == generated_by_idx:
+        score += 3
+        details.append("年支印星(+3)")
+
+    # ── 5. 天干生克 ──
+    other_stems = [
+        (year_stem, "年干"), (month_stem, "月干"), (hour_stem, "时干")
+    ]
+    for si, sname in other_stems:
+        se = STEM_ELEMENTS[si]
+        se_idx = ELEMENTS.index(se)
+        if se_idx == elem_idx:
+            score += 5
+            details.append(f"{sname}比劫(+5)")
+        elif se_idx == generated_by_idx:
+            score += 3
+            details.append(f"{sname}印星(+3)")
+        elif se_idx == controlled_by_idx:
+            score -= 5
+            details.append(f"{sname}官杀(-5)")
+
+    # ── 6. 全局流通性 ──
+    flow_score = _compute_flow_score(year_stem, month_stem, day_stem, hour_stem,
+                                      year_branch, month_branch, day_branch, hour_branch)
+    score += flow_score
+    if flow_score >= 5:
+        details.append(f"全局流通性好(+{flow_score})")
+    elif flow_score > 0:
+        details.append(f"局部流通(+{flow_score})")
+    elif flow_score < 0:
+        details.append(f"五行阻滞({flow_score})")
+
+    # ── 确定等级 ──
+    if score >= 80:
+        level = "极旺"
+    elif score >= 65:
+        level = "身强"
+    elif score >= 40:
+        level = "中和"
+    elif score >= 25:
+        level = "身弱"
+    else:
+        level = "极弱"
+
+    return {
+        "level": level,
+        "score": score,
+        "details": details,
+        "summary": f"日主{STEMS[day_stem]}（{de}），综合评分{score}，判定为{level}",
+    }
+
+
+def _compute_flow_score(y_stem, m_stem, d_stem, h_stem,
+                         y_branch, m_branch, d_branch, h_branch) -> int:
+    """计算四柱全局流通性分数。
+
+    检查天干和地支是否形成连续相生链（木→火→土→金→水→木）。
+    连续相生越多，流通性越好。
+    """
+    stem_elems = [STEM_ELEMENTS[s] for s in [y_stem, m_stem, d_stem, h_stem]]
+    branch_elems = [BRANCH_ELEMENTS[b] for b in [y_branch, m_branch, d_branch, h_branch]]
+
+    flow_pairs = 0.0
+
+    # 天干流通：年→月→日→时
+    for i in range(3):
+        curr = ELEMENTS.index(stem_elems[i])
+        nxt = ELEMENTS.index(stem_elems[i + 1])
+        if (curr + 1) % 5 == nxt:
+            flow_pairs += 1.0
+        elif curr == nxt:
+            flow_pairs += 0.5
+
+    # 地支流通
+    for i in range(3):
+        curr = ELEMENTS.index(branch_elems[i])
+        nxt = ELEMENTS.index(branch_elems[i + 1])
+        if (curr + 1) % 5 == nxt:
+            flow_pairs += 0.5
+        elif curr == nxt:
+            flow_pairs += 0.3
+
+    if flow_pairs >= 3.0:
+        return 8
+    elif flow_pairs >= 2.0:
+        return 5
+    elif flow_pairs >= 1.0:
+        return 2
+    elif flow_pairs >= 0.5:
+        return 0
+    return -2
+
+
 def _get_nayin(cycle_index: int) -> str:
     """根据60甲子序号获取纳音。"""
     return NAYIN_TABLE[cycle_index % 60]
@@ -241,26 +432,42 @@ def compute_bazi(birth_date: datetime.date, birth_hour: int, gender: str = "",
     pillars = [
         {"name": "年柱", "stem": STEMS[y_stem], "branch": BRANCHES[y_branch],
          "element": STEM_ELEMENTS[y_stem], "hidden_stem": BRANCH_HIDDEN[y_branch],
+         "hidden_stems_full": BRANCH_HIDDEN_STEMS_FULL[y_branch],
+         "branch_element": BRANCH_ELEMENTS[y_branch],
          "cycle_index": (6 * y_stem - 5 * y_branch) % 60},
         {"name": "月柱", "stem": STEMS[m_stem], "branch": BRANCHES[m_branch],
          "element": STEM_ELEMENTS[m_stem], "hidden_stem": BRANCH_HIDDEN[m_branch],
+         "hidden_stems_full": BRANCH_HIDDEN_STEMS_FULL[m_branch],
+         "branch_element": BRANCH_ELEMENTS[m_branch],
          "cycle_index": (6 * m_stem - 5 * m_branch) % 60},
         {"name": "日柱", "stem": STEMS[d_stem], "branch": BRANCHES[d_branch],
          "element": STEM_ELEMENTS[d_stem], "hidden_stem": BRANCH_HIDDEN[d_branch],
+         "hidden_stems_full": BRANCH_HIDDEN_STEMS_FULL[d_branch],
+         "branch_element": BRANCH_ELEMENTS[d_branch],
          "cycle_index": (6 * d_stem - 5 * d_branch) % 60},
         {"name": "时柱", "stem": STEMS[h_stem], "branch": BRANCHES[h_branch],
          "element": STEM_ELEMENTS[h_stem], "hidden_stem": BRANCH_HIDDEN[h_branch],
+         "hidden_stems_full": BRANCH_HIDDEN_STEMS_FULL[h_branch],
+         "branch_element": BRANCH_ELEMENTS[h_branch],
          "cycle_index": (6 * h_stem - 5 * h_branch) % 60},
     ]
 
     day_master = STEMS[d_stem]
     day_element = STEM_ELEMENTS[d_stem]
 
+    # 天干十神
     ten_gods = {}
     stems_in_pillars = [y_stem, m_stem, d_stem, h_stem]
     pillar_names = ["年干", "月干", "日干", "时干"]
     for si, sn in zip(stems_in_pillars, pillar_names):
         ten_gods[sn] = get_ten_gods(d_stem, si)
+
+    # 地支十神（基于地支主气藏干）
+    branch_ten_gods = {}
+    branches_list = [y_branch, m_branch, d_branch, h_branch]
+    branch_names = ["年支", "月支", "日支", "时支"]
+    for bi, bn in zip(branches_list, branch_names):
+        branch_ten_gods[bn] = get_ten_gods_for_branch(d_stem, bi)
 
     # 纳音 — 使用60甲子序号查表
     nayin = []
@@ -276,9 +483,11 @@ def compute_bazi(birth_date: datetime.date, birth_hour: int, gender: str = "",
     else:
         luck_direction = "逆排"
 
-    month_supports = BRANCH_ELEMENTS[m_branch] in [day_element,
-                     _element_generates(BRANCH_ELEMENTS[m_branch])]
-    day_master_strength = "得令" if month_supports else "失令"
+    # 综合日主强弱分析
+    strength = _compute_day_master_strength(
+        d_stem, d_branch, m_branch,
+        y_stem, y_branch, m_stem, h_stem, h_branch,
+    )
 
     # 真太阳时信息
     solar_correction_min = (longitude - timezone_offset * 15) * 4
@@ -291,10 +500,12 @@ def compute_bazi(birth_date: datetime.date, birth_hour: int, gender: str = "",
         "day_master_element": day_element,
         "day_master_yin_yang": "阳" if STEM_YANG[d_stem] else "阴",
         "ten_gods": ten_gods,
+        "branch_ten_gods": branch_ten_gods,
         "nayin": nayin,
         "zodiac": ZODIAC[y_branch],
         "luck_direction": luck_direction,
-        "day_master_strength": day_master_strength,
+        "day_master_strength": strength["level"],
+        "day_master_strength_detail": strength,
         "true_solar_time": {
             "original_hour": birth_hour,
             "corrected_hour": round(true_solar_hour, 2),

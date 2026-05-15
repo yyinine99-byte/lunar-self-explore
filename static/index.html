@@ -1049,6 +1049,26 @@ function showScreen(id) {
 function backToInput() {
   saveState();
   showScreen('screen-input');
+  // 恢复日期下拉选项，确保年/月变更时已正确填充日
+  refreshDayOptions();
+}
+
+function refreshDayOptions() {
+  const ySel = document.getElementById('birth-year');
+  const mSel = document.getElementById('birth-month');
+  const dSel = document.getElementById('birth-day');
+  const y = parseInt(ySel.value);
+  const m = parseInt(mSel.value);
+  const cur = dSel.value;
+  dSel.innerHTML = '<option value="">日期</option>';
+  if (!y || !m) return;
+  const daysInMonth = new Date(y, m, 0).getDate();
+  for (let d = 1; d <= daysInMonth; d++) {
+    const opt = document.createElement('option');
+    opt.value = d; opt.textContent = d + '日';
+    if (cur && parseInt(cur) === d) opt.selected = true;
+    dSel.appendChild(opt);
+  }
 }
 
 function newChart() {
@@ -1081,12 +1101,33 @@ function backToPortrait() {
 // Chart Generation
 // ═══════════════════════════════════════════
 async function generateChart() {
+  // 完整表单校验
   const y = parseInt(document.getElementById('birth-year').value);
   const m = parseInt(document.getElementById('birth-month').value);
   const d = parseInt(document.getElementById('birth-day').value);
+  const timeVal = document.getElementById('birth-time').value;
+  const countryVal = document.getElementById('country').value;
+  const provinceVal = document.getElementById('province').value;
+  const cityVal = document.getElementById('city').value;
+  const genderVal = document.getElementById('gender').value;
 
-  if (!y || !m || !d) {
-    alert('请选择完整的出生日期');
+  const missing = [];
+  if (!y || !m || !d) missing.push('出生日期（年/月/日）');
+  if (!timeVal) missing.push('出生时间');
+  if (!countryVal) missing.push('国家');
+  if (!provinceVal) missing.push('省份');
+  if (!cityVal) missing.push('城市');
+  if (!genderVal) missing.push('性别');
+
+  if (missing.length > 0) {
+    alert('请完善以下信息后再生成画像：\n\n' + missing.join('\n'));
+    // 高亮第一个缺失字段
+    const firstMissing = !y || !m || !d ? 'birth-year' :
+      !timeVal ? 'birth-time' :
+      !countryVal ? 'country' :
+      !provinceVal ? 'province' :
+      !cityVal ? 'city' : 'gender';
+    document.getElementById(firstMissing)?.focus();
     return;
   }
 
@@ -1206,19 +1247,20 @@ function renderPortrait(data) {
     html += `<div class="pcard">
       <div class="pcard-head"><div class="pcard-icon">🔮</div><div class="pcard-title">五行能量配置</div></div>
       <div class="pcard-content">
-      <table class="data-table"><tr><th>柱</th><th>干支</th><th>五行</th><th>藏干</th><th>纳音</th></tr>`;
+      <table class="data-table"><tr><th>柱</th><th>干支</th><th>五行</th><th>天干十神</th><th>地支十神</th><th>藏干</th><th>纳音</th></tr>`;
     if (pillars.length >= 4) {
+      const pillarShort = ['年', '月', '日', '时'];
       for (let i = 0; i < pillars.length; i++) {
         const p = pillars[i];
-        html += `<tr><td>${p.name}</td><td class="hi">${p.stem}${p.branch}</td><td>${p.element}</td><td>${p.hidden_stem||'-'}</td><td>${(bazi.nayin||[])[i]||'-'}</td></tr>`;
+        const stemGod = bazi.ten_gods?.[pillarShort[i] + '干'] || '-';
+        const branchGod = bazi.branch_ten_gods?.[pillarShort[i] + '支'] || '-';
+        html += `<tr><td>${p.name}</td><td class="hi">${p.stem}${p.branch}</td><td>${p.element}</td><td>${stemGod}</td><td>${branchGod}</td><td>${p.hidden_stem||'-'}</td><td>${(bazi.nayin||[])[i]||'-'}</td></tr>`;
       }
     }
     html += `</table>
     <div style="margin-top:8px;font-size:12px;">
       日主：<span>${bazi.day_master||'-'}（${bazi.day_master_element||'-'}·${bazi.day_master_yin_yang||'-'}）</span> ·
-      十神：${Object.entries(bazi.ten_gods||{}).map(([k,v]) => '<span>'+k+':'+v+'</span>').join(' ')}<br>
-      日主：<span>${bazi.day_master_strength||'-'}</span> · 生肖：<span>${bazi.zodiac||'-'}</span> · 起运：<span>${bazi.luck_direction||'-'}</span>
-    </div></div></div>`;
+      日主强弱：<span>${bazi.day_master_strength||'-'}</span> · 生肖：<span>${bazi.zodiac||'-'}</span> · 起运：<span>${bazi.luck_direction||'-'}</span></div></div></div>`;
 
     // Star mansion
     html += `<div class="pcard">

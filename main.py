@@ -104,11 +104,12 @@ async def api_chart(request: Request, body: ChartRequest):
             timezone_offset=body.timezone_offset,
         )
 
-        # 3. 计算农历日期 → 星宿（农历月法）
+        # 3. 计算农历日期 → 星宿（农历月法，含闰月处理）
         lunar = solar_to_lunar(birth_date)
         star_result = get_mansion_by_lunar_date(
             lunar_month=lunar["month"],
             lunar_day=lunar["day"],
+            is_leap=lunar.get("is_leap", False),
         )
 
         # 3b. 用月亮实际黄经做天文校验
@@ -124,7 +125,7 @@ async def api_chart(request: Request, body: ChartRequest):
             "chart": chart_result,
             "bazi": bazi_result,
             "star_mansion": star_result,
-            "lunar_date": f"农历{lunar['month']}月{lunar['day']}日",
+            "lunar_date": f"农历{'闰' if lunar.get('is_leap') else ''}{lunar['month']}月{lunar['day']}日",
         }
 
         return JSONResponse(content=combined)

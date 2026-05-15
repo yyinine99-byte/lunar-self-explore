@@ -65,11 +65,14 @@ def build_messages(chart_data: dict, user_message: str, history: Optional[list] 
         pillars_text = ""
         for p in bazi_info.get("pillars", []):
             pillars_text += f"{p.get('name', '')}: {p.get('stem', '')}{p.get('branch', '')} ({p.get('element', '')}) | "
+        strength = bazi_info.get('day_master_strength_detail', {})
         context_blocks.append(f"""【五行能量数据】
 日主：{bazi_info.get('day_master', 'N/A')}（{bazi_info.get('day_master_element', '')}·{bazi_info.get('day_master_yin_yang', '')}）
 四柱：{pillars_text}
-十神：{bazi_info.get('ten_gods', {})}
-日主强弱：{bazi_info.get('day_master_strength', 'N/A')}""")
+天干十神：{bazi_info.get('ten_gods', {})}
+地支十神：{bazi_info.get('branch_ten_gods', {})}
+日主强弱：{bazi_info.get('day_master_strength', 'N/A')}（评分{strength.get('score', 'N/A')}，{'; '.join(strength.get('details', []))}）
+各柱藏干：{', '.join([f"{p.get('name','')}:{','.join(p.get('hidden_stems_full',[]))}" for p in bazi_info.get('pillars', [])])}""")
 
     # 星宿信息
     if star_info:
