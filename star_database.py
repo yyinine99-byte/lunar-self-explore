@@ -2,6 +2,9 @@
 
 二十八宿按农历每月有固定起始宿，月内按日递推。
 同时用月亮实际黄经做天文校验。
+
+星宿关系系统：基于二十八宿圆周距离计算六种关系类型
+（命之星/业胎/安坏/荣亲/危成/友衰），含互动模式描述。
 """
 
 # 二十八宿名称（按顺序）
@@ -125,3 +128,153 @@ def get_mansion_by_lunar_date(lunar_month: int, lunar_day: int, lunar_year: int 
         "personality": data.get("personality", ""),
         "method": "lunar_month",
     }
+
+
+# ═══════════════════════════════════════════
+# 星宿关系系统 — 二十八宿圆周距离 → 六种关系类型
+# ═══════════════════════════════════════════
+
+# 六种关系类型的互动模式描述
+RELATIONSHIP_MODES = {
+    "命之星": {
+        "tag": "灵魂镜像",
+        "dynamic": "你们像在照镜子——相似到不可思议。彼此是最深的认同，无需多言的默契，但也可能因为太像而较劲。不是互补，是共振。",
+        "strength": "理解力满分、灵魂深处的共振、天然信任感",
+        "risk": "相似缺点互相放大、容易陷入'谁更对'的争夺",
+        "best_for": "深度陪伴、共同成长、灵魂层面的对话",
+    },
+    "业胎": {
+        "tag": "宿命纠缠",
+        "dynamic": "业力最深的关系——业是被动承接方，胎是主动施与方。说不清为什么离不开，因为羁绊不只这一世。常伴有强烈的归属感和共同使命感，但也容易沉溺其中失去自我。",
+        "strength": "无法替代的深度连接、强烈的归属感、共同使命感",
+        "risk": "容易依赖甚至沉溺、分开后难以真正断开、边界模糊",
+        "best_for": "深刻的情感体验、共同完成一件大事",
+    },
+    "安坏": {
+        "tag": "相爱相杀",
+        "dynamic": "安是安抚者，坏是破坏者——但破坏不是恶意的，是来打碎你的壳让你看见真实的自己。安坏关系里永远在上演追逐与拉扯：近安坏轰轰烈烈如火山喷发，占有欲强到窒息，恨海情天；远安坏若即若离，相隔万里却总被命运拉回；中安坏在激烈与温和间摇摆。这是最'上头'也最'疯'的关系类型。",
+        "strength": "极致的激情和吸引力、促人快速成长和觉醒",
+        "risk": "占有欲失控、情绪过山车、争吵激烈、相互消耗",
+        "best_for": "脱胎换骨的恋爱经历（未必适合安稳婚姻）",
+    },
+    "荣亲": {
+        "tag": "相敬如宾",
+        "dynamic": "荣是荣耀方，亲是亲近方——像家人一样温暖稳定。荣亲关系缺乏轰轰烈烈的戏剧性，但有一粥一饭的踏实。近荣亲如兄妹般自然，远荣亲如远房亲戚般客气，中荣亲在亲密与距离间找到平衡。适合过日子，不适合'谈恋爱'。",
+        "strength": "稳定、温暖、像家人一样的安全感、低冲突",
+        "risk": "容易变淡、缺乏激情、可能沦为习惯和将就",
+        "best_for": "稳定的婚姻和长期伴侣关系",
+    },
+    "危成": {
+        "tag": "利益共生",
+        "dynamic": "危是冒险方，成是成就方——一起做事比一起谈情更顺。危成关系的底色是'我可以从你身上得到什么'：近危成是事业上的黄金组合，远危成是远距离的利益联盟，中危成在功利和真情间拉锯。当利益一致时坚不可摧，利益冲突时瞬间瓦解。",
+        "strength": "事业上最好的搭档、资源互补、目标驱动",
+        "risk": "利益冲突时关系脆弱、容易物化对方、感情成为筹码",
+        "best_for": "事业合作、资源互补、目标导向的关系",
+    },
+    "友衰": {
+        "tag": "君子之交",
+        "dynamic": "友是付出方，衰是受益方——像知己又像损友。友衰关系最轻松但也最'不靠谱'：近友衰是灵魂好友无话不谈，远友衰是点头之交淡如水，中友衰在朋友与暧昧间暧昧不清。可以聊一整夜，但未必能共度一生。",
+        "strength": "轻松自在、精神层面高度共鸣、无压力",
+        "risk": "难以落地、容易停在'聊得来'、可能只是精神寄托",
+        "best_for": "精神交流、放松的陪伴、互相启发",
+    },
+}
+
+# 距离 → (关系类型, 距离等级) 映射
+def _get_relationship_by_distance(d: int) -> tuple:
+    """根据二十八宿圆周最短距离返回关系类型和等级。"""
+    mapping = {
+        0:  ("命之星", ""),
+        1:  ("业胎", ""),
+        2:  ("安坏", "近"),
+        3:  ("安坏", "远"),
+        4:  ("荣亲", "近"),
+        5:  ("荣亲", "远"),
+        6:  ("危成", "近"),
+        7:  ("危成", "远"),
+        8:  ("友衰", "近"),
+        9:  ("友衰", "远"),
+        10: ("安坏", "中"),
+        11: ("荣亲", "中"),
+        12: ("危成", "中"),
+        13: ("友衰", "中"),
+    }
+    # d=14 是圆周的正对面，归入中安坏
+    return mapping.get(d, ("安坏", "中"))
+
+
+def get_relationship(mansion_idx_a: int, mansion_idx_b: int) -> dict:
+    """计算两个星宿之间的关系。
+
+    Args:
+        mansion_idx_a: 第一个星宿的索引 (1-28)
+        mansion_idx_b: 第二个星宿的索引 (1-28)
+
+    Returns:
+        包含关系类型、等级、互动模式描述的字典
+    """
+    if mansion_idx_a == mansion_idx_b:
+        rel_type, grade = "命之星", ""
+    else:
+        diff = abs(mansion_idx_a - mansion_idx_b)
+        d = min(diff, 28 - diff)
+        rel_type, grade = _get_relationship_by_distance(d)
+
+    # 判断安/坏、危/成、友/衰等角色
+    clockwise = (mansion_idx_b - mansion_idx_a) % 28
+    role_a, role_b = "", ""
+    if rel_type == "安坏":
+        role_a, role_b = ("坏", "安") if clockwise <= 14 else ("安", "坏")
+    elif rel_type == "危成":
+        role_a, role_b = ("危", "成") if clockwise <= 14 else ("成", "危")
+    elif rel_type == "友衰":
+        role_a, role_b = ("友", "衰") if clockwise <= 14 else ("衰", "友")
+    elif rel_type == "荣亲":
+        role_a, role_b = ("荣", "亲") if clockwise <= 14 else ("亲", "荣")
+    elif rel_type == "业胎":
+        role_a, role_b = ("胎", "业") if clockwise <= 14 else ("业", "胎")
+
+    mode = RELATIONSHIP_MODES.get(rel_type, {})
+    label = f"{grade}{rel_type}" if grade else rel_type
+
+    return {
+        "type": rel_type,
+        "grade": grade,
+        "label": label,
+        "role_a": role_a,
+        "role_b": role_b,
+        "tag": mode.get("tag", ""),
+        "dynamic": mode.get("dynamic", ""),
+        "strength": mode.get("strength", ""),
+        "risk": mode.get("risk", ""),
+        "best_for": mode.get("best_for", ""),
+    }
+
+
+def get_relationship_map(mansion_idx: int) -> list:
+    """获取某个星宿与全部 28 个星宿的关系地图（去重，只保留每种关系类型的最优代表）。"""
+    name = MANSION_NAMES[mansion_idx - 1] if 1 <= mansion_idx <= 28 else ""
+    my_data = MANSION_DATA.get(name, {})
+
+    # 找出每种关系类型+等级的组合的代表星宿
+    seen = set()
+    relations = []
+    for i in range(1, 29):
+        if i == mansion_idx:
+            continue
+        rel = get_relationship(mansion_idx, i)
+        key = rel["label"]
+        if key not in seen:
+            seen.add(key)
+            other_name = MANSION_NAMES[i - 1]
+            other_data = MANSION_DATA.get(other_name, {})
+            rel["mansion"] = other_name
+            rel["mansion_element"] = other_data.get("element", "")
+            rel["mansion_animal"] = other_data.get("animal", "")
+            relations.append(rel)
+
+    # 按关系类型分组排序：业胎 > 安坏 > 荣亲 > 危成 > 友衰 > 命之星
+    type_order = {"业胎": 0, "安坏": 1, "荣亲": 2, "危成": 3, "友衰": 4, "命之星": 5}
+    relations.sort(key=lambda r: (type_order.get(r["type"], 9), r["grade"]))
+
+    return relations

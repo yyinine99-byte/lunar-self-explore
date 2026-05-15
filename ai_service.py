@@ -12,6 +12,7 @@ import os
 import httpx
 from typing import Optional, AsyncGenerator
 from system_prompts import SYSTEM_PROMPT_FULL
+from star_database import get_relationship_map
 
 # DeepSeek API 配置
 DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
@@ -130,12 +131,38 @@ def build_messages(chart_data: dict, user_message: str, history: Optional[list] 
 
 十神速查：{god_note}""")
 
-    # 星宿信息
+    # 星宿信息（含关系系统）
     if star_info:
+        mansion_name = star_info.get('name', 'N/A')
+        mansion_idx = star_info.get('index', 0)
+
+        # 星宿关系地图：按类型归组，每类型一行，列出近/中/远代表星宿
+        rel_lines = []
+        if mansion_idx:
+            try:
+                from collections import OrderedDict
+                relations = get_relationship_map(mansion_idx)
+                type_groups = OrderedDict()
+                for r in relations:
+                    t = r['type']
+                    if t not in type_groups:
+                        type_groups[t] = {'grades': [], 'tag': r['tag'], 'dynamic': r['dynamic'],
+                                           'strength': r['strength'], 'risk': r['risk'], 'best_for': r['best_for']}
+                    g = r['grade']
+                    type_groups[t]['grades'].append(f"{g}({r['mansion']})" if g else r['mansion'])
+                for t, info in type_groups.items():
+                    grades_str = '、'.join(info['grades'])
+                    first_sentence = info['dynamic'].split('。')[0] if info['dynamic'] else ''
+                    rel_lines.append(f"  {t}：{grades_str}\n    → {info['tag']}——{first_sentence}\n    优势：{info['strength']}\n    风险：{info['risk']}")
+            except Exception:
+                pass
+
         context_blocks.append(f"""【星宿数据】
-{star_info.get('name', 'N/A')}（{star_info.get('element', '')}·{star_info.get('direction', '')}方）
-动物象征：{star_info.get('animal', 'N/A')}
-性格关键词：{star_info.get('personality', 'N/A')}""")
+{mansion_name}（{star_info.get('element', '')}·{star_info.get('direction', '')}方·{star_info.get('animal', '')}）
+性格关键词：{star_info.get('personality', 'N/A')}
+
+星宿关系地图 — {mansion_name}与其他星宿的六种适配关系：
+{chr(10).join(rel_lines) if rel_lines else '（关系数据暂不可用）'}""")
 
     # 构建完整消息
     system_content = SYSTEM_PROMPT_FULL + "\n\n==== 用户个人信息（供参考）====\n" + "\n\n".join(context_blocks) + "\n\n==== 以上是用户的计算结果 ====\n请用这些信息辅助分析，但不要全部罗列出来。在用户问到时自然地引用相关数据。"
