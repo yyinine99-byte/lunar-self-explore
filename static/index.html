@@ -1051,6 +1051,10 @@ function backToInput() {
   showScreen('screen-input');
   // 恢复日期下拉选项，确保年/月变更时已正确填充日
   refreshDayOptions();
+  // 重置生成按钮状态
+  const btn = document.getElementById('btn-generate');
+  btn.disabled = false;
+  btn.textContent = '✦ 生成我的画像';
 }
 
 function refreshDayOptions() {
@@ -1086,6 +1090,10 @@ function newChart() {
   document.getElementById('country').value = '中国';
   document.getElementById('gender').value = '';
   onCountryChange();
+  // 重置生成按钮状态
+  const btn = document.getElementById('btn-generate');
+  btn.disabled = false;
+  btn.textContent = '✦ 生成我的画像';
 }
 
 function backToPortrait() {
