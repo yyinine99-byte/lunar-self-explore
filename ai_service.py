@@ -11,7 +11,7 @@
 import os
 import httpx
 from typing import Optional, AsyncGenerator
-from system_prompts import SYSTEM_PROMPT_FULL
+from system_prompts import SYSTEM_PROMPT_EXPLORE, SYSTEM_PROMPT_ANSWER
 from star_database import get_relationship_map
 
 # DeepSeek API 配置
@@ -74,20 +74,75 @@ def build_messages(chart_data: dict, user_message: str, history: Optional[list] 
         "极弱": "能量不足→敏感善察，需从旁支找支撑",
     }
 
-    # 星盘关键信息
+    # 星盘关键信息 — 三层分级 + 相位
     if chart_info:
         asc = chart_info.get("ascendant", {})
         planets = chart_info.get("planets", [])
+        aspects = chart_info.get("aspects", [])
+
+        # ── 行星分组 ──
+        def _pl(p):
+            """格式化单颗行星：名+星座+度数"""
+            return f"{p.get('name_cn','')}{p.get('sign','')}{p.get('degree_in_sign','')}°"
+
+        # 核心（日月升）
         sun = next((p for p in planets if p.get("name_en") == "Sun"), {})
         moon = next((p for p in planets if p.get("name_en") == "Moon"), {})
+        core_strs = [
+            f"日{sun.get('sign','?')}{sun.get('degree_in_sign','')}°",
+            f"月{moon.get('sign','?')}{moon.get('degree_in_sign','')}°",
+            f"升{asc.get('sign','?')}{asc.get('degree','')}°",
+        ]
+
+        # 个性行星（水金火）
+        personal_names = {"Mercury": "水星", "Venus": "金星", "Mars": "火星"}
+        personal = [p for p in planets if p.get("name_en") in personal_names]
+        personal_strs = [_pl(p) for p in personal]
+
+        # 外行星（木土天海冥）
+        outer_names = {"Jupiter": "木星", "Saturn": "土星", "Uranus": "天王星", "Neptune": "海王星", "Pluto": "冥王星"}
+        outer = [p for p in planets if p.get("name_en") in outer_names]
+        outer_strs = [_pl(p) for p in outer]
+
+        # ── 相位（硬/软分级） ──
+        # 硬相位：合/刑/冲 → 重点解读，尤其 orb≤5°；软相位：六合/拱 → 次要
+        aspect_abbr = {"合相": "合", "四分相": "刑", "对分相": "冲",
+                       "六分相": "六合", "三分相": "拱"}
+        hard_aspects = []  # 合/刑/冲
+        soft_aspects = []  # 六合/拱
+        if aspects:
+            for a in aspects:
+                raw_type = a.get("aspect", "")
+                abbr = aspect_abbr.get(raw_type, raw_type)
+                entry = f"{a['planet1']}{abbr}{a['planet2']}(orb{a['orb']}°)"
+                if raw_type in ("合相", "四分相", "对分相"):
+                    hard_aspects.append(entry)
+                else:
+                    soft_aspects.append(entry)
+
+        def _build_aspect_block():
+            lines = []
+            if hard_aspects:
+                hard_line = "  ".join(hard_aspects)
+                lines.append(f"硬相位（合/刑/冲，≤5°为重点）：{hard_line}")
+            else:
+                lines.append("硬相位：无")
+            if soft_aspects:
+                soft_line = "  ".join(soft_aspects)
+                lines.append(f"软相位（六合/拱，次要）：{soft_line}")
+            else:
+                lines.append("软相位：无")
+            return "\n".join(lines)
+
+        aspect_block = _build_aspect_block()
 
         context_blocks.append(f"""【星盘数据】
-太阳：{sun.get('sign', 'N/A')} {sun.get('degree_in_sign', '')}°
-月亮：{moon.get('sign', 'N/A')} {moon.get('degree_in_sign', '')}°
-上升：{asc.get('sign', 'N/A')} {asc.get('degree', '')}°
-主导元素：{chart_info.get('dominant_element', 'N/A')}
-元素分布：火{chart_info.get('element_distribution', {}).get('火', 0)} 土{chart_info.get('element_distribution', {}).get('土', 0)} 风{chart_info.get('element_distribution', {}).get('风', 0)} 水{chart_info.get('element_distribution', {}).get('水', 0)}
-行星位置：{', '.join([f"{p.get('name_cn','')}{p.get('sign','')}{p.get('degree_in_sign','')}°" for p in planets if p.get('name_cn')]) if planets else 'N/A'}""")
+核心：{' / '.join(core_strs)}
+个性：{' / '.join(personal_strs)}
+外行：{' / '.join(outer_strs)}
+元素：{chart_info.get('dominant_element', '?')}主导 火{chart_info.get('element_distribution', {}).get('火', 0)}土{chart_info.get('element_distribution', {}).get('土', 0)}风{chart_info.get('element_distribution', {}).get('风', 0)}水{chart_info.get('element_distribution', {}).get('水', 0)}
+相位：
+{aspect_block}""")
 
     # 五行能量关键信息（重写：干净格式 + 人格化桥接）
     if bazi_info:
@@ -164,26 +219,9 @@ def build_messages(chart_data: dict, user_message: str, history: Optional[list] 
 星宿关系地图 — {mansion_name}与其他星宿的六种适配关系：
 {chr(10).join(rel_lines) if rel_lines else '（关系数据暂不可用）'}""")
 
-    # 构建完整消息
-    system_content = SYSTEM_PROMPT_FULL + "\n\n==== 用户个人信息（供参考）====\n" + "\n\n".join(context_blocks) + "\n\n==== 以上是用户的计算结果 ====\n请用这些信息辅助分析，但不要全部罗列出来。在用户问到时自然地引用相关数据。"
-
-    # 模式指令
-    if mode == "answer":
-        system_content += """
-\n## 当前模式：答案模式 ⚡
-- 直接给结论，不要铺垫和推导过程，像朋友聊天一样直给
-- 三维综合分析原则不变——三个体系的数据自己在内部交叉比对，但输出时只呈现结论，不展示比对过程
-- 禁止使用星宿关系类型名称（安坏/荣亲/危成/友衰/业胎/命之星），用生活化描述替代；日主天干（如辛金/甲木）、星座名、行星名可自然提及，但不要用「日主」「十神」等学术框架词汇
-- 星宿关系→生活化表达的参考方向（根据语境灵活运用）：
-  · 安坏→深刻拉扯、相爱相杀、火山般的吸引、让你又爱又痛
-  · 荣亲→像家人一样安稳、相敬如宾、细水长流的踏实
-  · 危成→利益与感情的纠葛、一起做事比谈情更顺、互相成就
-  · 友衰→轻松自在但难落地、灵魂上的聊得来、像知己也像损友
-  · 业胎→说不清的羁绊、离不开的宿命感、最深的情感连接
-  · 命之星→像在照镜子、灵魂共振、另一个自己
-- 回答风格参考：「你的底层（辛金易碎）喜欢被捧着，加上（水瓶座）自由独立的特质，再加上（冥王4宫）深层的不安全感，所以你很容易被深刻拉扯、相爱相杀的关系吸引——但那个状态你可能并不舒服。日常相处里，你其实更需要能轻松交流、让你不设防的关系。」
-- 核心：用多个维度的特质共同解释一个情感模式，而不是分别介绍三个体系
-- 如果用户追问原因，简单补充，保持直接"""
+    # 构建完整消息 — 按模式选择独立 prompt
+    base_prompt = SYSTEM_PROMPT_ANSWER if mode == "answer" else SYSTEM_PROMPT_EXPLORE
+    system_content = base_prompt + "\n\n==== 用户个人信息（供参考）====\n" + "\n\n".join(context_blocks) + "\n\n==== 以上是用户的计算结果 ====\n请用这些信息辅助分析，但不要全部罗列出来。在用户问到时自然地引用相关数据。"
 
     messages = [{"role": "system", "content": system_content}]
 
