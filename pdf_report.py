@@ -18,24 +18,53 @@ logger = logging.getLogger(__name__)
 # ═══════════════════════════════════════════
 
 def _find_chinese_font() -> str:
-    """查找可用的中文字体，返回字体文件路径。"""
+    """查找可用的中文字体，返回字体文件路径。找不到时自动下载。"""
+    # 项目本地字体目录
+    local_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts")
+    local_path = os.path.join(local_dir, "wqy-microhei.ttc")
+
     candidates = [
+        # 项目本地
+        local_path,
         # macOS
         "/System/Library/Fonts/STHeiti Medium.ttc",
         "/System/Library/Fonts/Supplemental/Songti.ttc",
         "/System/Library/Fonts/PingFang.ttc",
         # Linux (Railway / common distros)
         "/usr/share/fonts/truetype/wqy/wqy-microhei.ttc",
+        "/usr/share/fonts/opentype/wqy/wqy-microhei.ttc",
         "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc",
         "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
         "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
         "/usr/share/fonts/noto-cjk/NotoSansCJK-Regular.ttc",
         "/usr/share/fonts/google-noto-cjk/NotoSansCJK-Regular.ttc",
+        # 也搜一下 wqy 目录
+        "/usr/share/fonts/wqy/wqy-microhei.ttc",
+        "/usr/share/fonts/wqy-microhei/wqy-microhei.ttc",
+        "/usr/share/fonts/truetype/wqy-microhei.ttc",
     ]
     for path in candidates:
         if os.path.exists(path):
             logger.info(f"Using Chinese font: {path}")
             return path
+
+    # 自动下载字体
+    try:
+        os.makedirs(local_dir, exist_ok=True)
+        import urllib.request
+        # WQY Micro Hei — 开源中文字体 (~5MB)
+        url = (
+            "https://raw.githubusercontent.com/anthonyfok/fonts-wqy-microhei/"
+            "master/wqy-microhei.ttc"
+        )
+        logger.info(f"Downloading Chinese font to {local_path} ...")
+        urllib.request.urlretrieve(url, local_path)
+        if os.path.exists(local_path) and os.path.getsize(local_path) > 100000:
+            logger.info("Font downloaded successfully")
+            return local_path
+    except Exception as e:
+        logger.error(f"Failed to download font: {e}")
+
     logger.warning("No Chinese font found, PDF will fall back to ASCII")
     return ""
 
