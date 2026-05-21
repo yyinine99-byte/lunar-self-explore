@@ -269,6 +269,14 @@
   .msg-bubble table th { color: var(--gold); font-weight: 600; text-align: left; padding: 4px 5px; border-bottom: 1px solid rgba(255,255,255,0.1); white-space: nowrap; font-size: 10px; }
   .msg-bubble table td { padding: 4px 5px; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text); font-size: 10px; }
 
+  .continue-btn {
+    display: inline-block; margin-top: 10px; padding: 6px 14px;
+    background: rgba(200,180,155,0.1); border: 1px solid rgba(200,180,155,0.25);
+    border-radius: 14px; color: var(--gold); font-size: 12px; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .continue-btn:hover { background: rgba(200,180,155,0.2); }
+
   .chat-input-area {
     display: flex; gap: 8px; padding-top: 12px;
     border-top: 1px solid var(--border);
@@ -989,6 +997,42 @@ async function fetchWithTimeout(url, options, timeoutMs = 30000, retries = 1) {
   throw lastError;
 }
 
+// Build a compact summary from overflow messages (preserves topics without raw text)
+function buildContextSummary(messages) {
+  const userQs = messages.filter(m => m.role === 'user').map(m => {
+    return m.content.length > 40 ? m.content.slice(0, 40) + '…' : m.content;
+  });
+  if (userQs.length === 0) return '';
+  return '此前讨论：' + userQs.join(' | ');
+}
+
+// Detect if AI response appears truncated (ends mid-sentence or short trailing clause)
+function looksTruncated(text) {
+  if (!text || text.length < 60) return false;
+  const lastChar = text[text.length - 1];
+  if ('，、；：,;:'.includes(lastChar)) return true;
+  if (text.endsWith('...') || text.endsWith('…')) return true;
+  const lastSentence = text.split(/[。！？.!?\n]/).pop() || '';
+  if (lastSentence.length > 0 && lastSentence.length < 12) return true;
+  return false;
+}
+
+// Show a "continue" button below a truncated assistant message
+function showContinueButton(msgId) {
+  const container = document.querySelector(`[data-msg-id="${msgId}"]`);
+  if (!container) return;
+  const existing = container.querySelector('.continue-btn');
+  if (existing) return;
+  const btn = document.createElement('button');
+  btn.className = 'continue-btn';
+  btn.textContent = '回复可能不完整，点击继续 →';
+  btn.onclick = () => {
+    btn.remove();
+    sendMessage('请从刚才被打断的地方继续，不用重复之前的内容。');
+  };
+  container.appendChild(btn);
+}
+
 // Save/restore state
 function saveState() {
   if (!chartData) return;
@@ -1503,8 +1547,15 @@ async function sendMessage(msg) {
   const typingId = addTypingIndicator();
 
   try {
-    // Trim history to prevent payload bloat (keep last 20 messages = 10 rounds)
-    const trimmedHistory = chatHistory.length > 20 ? chatHistory.slice(-20) : chatHistory;
+    // Smart history management: keep last 12 msgs verbatim, summarize older overflow
+    const KEEP_RECENT = 12;
+    let recentHistory = chatHistory;
+    let contextSummary = '';
+    if (chatHistory.length > KEEP_RECENT) {
+      const overflow = chatHistory.slice(0, chatHistory.length - KEEP_RECENT);
+      recentHistory = chatHistory.slice(-KEEP_RECENT);
+      contextSummary = buildContextSummary(overflow);
+    }
 
     const resp = await fetchWithTimeout('/api/chat', {
       method: 'POST',
@@ -1513,8 +1564,9 @@ async function sendMessage(msg) {
         session_id: sessionId,
         message: message,
         chart_data: chartData,
-        history: trimmedHistory.slice(0, -1),
+        history: recentHistory.slice(0, -1),
         mode: chatMode,
+        context_summary: contextSummary,
       }),
     }, 120000, 1);
 
@@ -1565,6 +1617,9 @@ async function sendMessage(msg) {
     if (fullContent) {
       chatHistory.push({ role: 'assistant', content: fullContent });
       saveState();
+      if (looksTruncated(fullContent)) {
+        showContinueButton(assistantId);
+      }
     } else {
       removeMessage(assistantId);
       await fallbackNonStream(message);
@@ -1580,7 +1635,14 @@ async function sendMessage(msg) {
 
 async function fallbackNonStream(message) {
   try {
-    const trimmedHistory = chatHistory.length > 20 ? chatHistory.slice(-20) : chatHistory;
+    const KEEP_RECENT = 12;
+    let recentHistory = chatHistory;
+    let contextSummary = '';
+    if (chatHistory.length > KEEP_RECENT) {
+      const overflow = chatHistory.slice(0, chatHistory.length - KEEP_RECENT);
+      recentHistory = chatHistory.slice(-KEEP_RECENT);
+      contextSummary = buildContextSummary(overflow);
+    }
     const resp = await fetchWithTimeout('/api/chat/sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1588,8 +1650,9 @@ async function fallbackNonStream(message) {
         session_id: sessionId,
         message: message,
         chart_data: chartData,
-        history: trimmedHistory.slice(0, -1),
+        history: recentHistory.slice(0, -1),
         mode: chatMode,
+        context_summary: contextSummary,
       }),
     }, 60000, 1);
     const data = await resp.json();

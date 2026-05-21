@@ -23,7 +23,7 @@ DEEPSEEK_MODEL = "deepseek-chat"  # 成本最优，中文能力强
 # 也可以使用 OpenAI 兼容的第三方 API
 
 
-def build_messages(chart_data: dict, user_message: str, history: Optional[list] = None, mode: str = "explore") -> list:
+def build_messages(chart_data: dict, user_message: str, history: Optional[list] = None, mode: str = "explore", context_summary: str = "") -> list:
     """构建发送给 AI 的完整消息列表。
 
     将用户的出生信息计算结果嵌入到 system prompt 中，
@@ -34,6 +34,7 @@ def build_messages(chart_data: dict, user_message: str, history: Optional[list] 
         user_message: 用户当前消息
         history: 之前的对话历史
         mode: "explore" (探索模式) 或 "answer" (答案模式)
+        context_summary: 对话历史摘要（当历史过长时，替代被裁剪的早期消息）
 
     Returns:
         messages 列表
@@ -73,6 +74,15 @@ def build_messages(chart_data: dict, user_message: str, history: Optional[list] 
         "身弱": "能量偏弱→善借力合作，需避免过度消耗",
         "极弱": "能量不足→敏感善察，需从旁支找支撑",
     }
+    SIGN_ABBR = {
+        "白羊座": "羊", "金牛座": "牛", "双子座": "双", "巨蟹座": "蟹",
+        "狮子座": "狮", "处女座": "女", "天秤座": "秤", "天蝎座": "蝎",
+        "射手座": "射", "摩羯座": "羯", "水瓶座": "瓶", "双鱼座": "鱼",
+    }
+    PLANET_ABBR = {
+        "太阳": "日", "月球": "月", "水星": "水", "金星": "金", "火星": "火",
+        "木星": "木", "土星": "土", "天王星": "天", "海王星": "海", "冥王星": "冥",
+    }
 
     # 星盘关键信息 — 三层分级 + 相位
     if chart_info:
@@ -82,16 +92,23 @@ def build_messages(chart_data: dict, user_message: str, history: Optional[list] 
 
         # ── 行星分组 ──
         def _pl(p):
-            """格式化单颗行星：名+星座+度数"""
-            return f"{p.get('name_cn','')}{p.get('sign','')}{p.get('degree_in_sign','')}°"
+            """格式化单颗行星：缩写名+缩写星座+度数"""
+            sign = p.get('sign','')
+            sign_ab = SIGN_ABBR.get(sign, sign)
+            pn = p.get('name_cn','')
+            pn_ab = PLANET_ABBR.get(pn, pn)
+            return f"{pn_ab}{sign_ab}{p.get('degree_in_sign','')}°"
 
         # 核心（日月升）
         sun = next((p for p in planets if p.get("name_en") == "Sun"), {})
         moon = next((p for p in planets if p.get("name_en") == "Moon"), {})
+        sun_sign_ab = SIGN_ABBR.get(sun.get('sign','?'), sun.get('sign','?'))
+        moon_sign_ab = SIGN_ABBR.get(moon.get('sign','?'), moon.get('sign','?'))
+        asc_sign_ab = SIGN_ABBR.get(asc.get('sign','?'), asc.get('sign','?'))
         core_strs = [
-            f"日{sun.get('sign','?')}{sun.get('degree_in_sign','')}°",
-            f"月{moon.get('sign','?')}{moon.get('degree_in_sign','')}°",
-            f"升{asc.get('sign','?')}{asc.get('degree','')}°",
+            f"日{sun_sign_ab}{sun.get('degree_in_sign','')}°",
+            f"月{moon_sign_ab}{moon.get('degree_in_sign','')}°",
+            f"升{asc_sign_ab}{asc.get('degree','')}°",
         ]
 
         # 个性行星（水金火）
@@ -105,7 +122,6 @@ def build_messages(chart_data: dict, user_message: str, history: Optional[list] 
         outer_strs = [_pl(p) for p in outer]
 
         # ── 相位（硬/软分级） ──
-        # 硬相位：合/刑/冲 → 重点解读，尤其 orb≤5°；软相位：六合/拱 → 次要
         aspect_abbr = {"合相": "合", "四分相": "刑", "对分相": "冲",
                        "六分相": "六合", "三分相": "拱"}
         hard_aspects = []  # 合/刑/冲
@@ -114,7 +130,9 @@ def build_messages(chart_data: dict, user_message: str, history: Optional[list] 
             for a in aspects:
                 raw_type = a.get("aspect", "")
                 abbr = aspect_abbr.get(raw_type, raw_type)
-                entry = f"{a['planet1']}{abbr}{a['planet2']}(orb{a['orb']}°)"
+                p1 = PLANET_ABBR.get(a['planet1'], a['planet1'])
+                p2 = PLANET_ABBR.get(a['planet2'], a['planet2'])
+                entry = f"{p1}{abbr}{p2}({a['orb']}°)"
                 if raw_type in ("合相", "四分相", "对分相"):
                     hard_aspects.append(entry)
                 else:
@@ -123,25 +141,21 @@ def build_messages(chart_data: dict, user_message: str, history: Optional[list] 
         def _build_aspect_block():
             lines = []
             if hard_aspects:
-                hard_line = "  ".join(hard_aspects)
-                lines.append(f"硬相位（合/刑/冲，≤5°为重点）：{hard_line}")
+                lines.append(f"硬: {'  '.join(hard_aspects)}")
             else:
-                lines.append("硬相位：无")
+                lines.append("硬: 无")
             if soft_aspects:
-                soft_line = "  ".join(soft_aspects)
-                lines.append(f"软相位（六合/拱，次要）：{soft_line}")
+                lines.append(f"软: {'  '.join(soft_aspects)}")
             else:
-                lines.append("软相位：无")
+                lines.append("软: 无")
             return "\n".join(lines)
 
         aspect_block = _build_aspect_block()
 
-        context_blocks.append(f"""【星盘数据】
-核心：{' / '.join(core_strs)}
-个性：{' / '.join(personal_strs)}
-外行：{' / '.join(outer_strs)}
-元素：{chart_info.get('dominant_element', '?')}主导 火{chart_info.get('element_distribution', {}).get('火', 0)}土{chart_info.get('element_distribution', {}).get('土', 0)}风{chart_info.get('element_distribution', {}).get('风', 0)}水{chart_info.get('element_distribution', {}).get('水', 0)}
-相位：
+        elem = chart_info.get('element_distribution', {})
+        context_blocks.append(f"""【星盘】
+{' / '.join(core_strs)} | {' / '.join(personal_strs)} | {' / '.join(outer_strs)}
+{chart_info.get('dominant_element', '?')}主导(火{elem.get('火',0)}土{elem.get('土',0)}风{elem.get('风',0)}水{elem.get('水',0)})
 {aspect_block}""")
 
     # 五行能量关键信息（重写：干净格式 + 人格化桥接）
@@ -153,7 +167,7 @@ def build_messages(chart_data: dict, user_message: str, history: Optional[list] 
         sl = bazi_info.get('day_master_strength', '')
         si = STRENGTH_IMPL.get(sl, '')
 
-        # 四柱 — 每柱一行
+        # 四柱 — 紧凑格式
         pillar_lines = []
         abbr_map = {"年柱": "年", "月柱": "月", "日柱": "日", "时柱": "时"}
         for p in bazi_info.get("pillars", []):
@@ -163,7 +177,7 @@ def build_messages(chart_data: dict, user_message: str, history: Optional[list] 
             bg = bazi_info.get("branch_ten_gods", {}).get(f"{ab}支", "")
             hs = ",".join(p.get("hidden_stems_full", [])[:2])
             pillar_lines.append(
-                f"  {nm} {p.get('stem','')}{p.get('branch','')}（{p.get('element','')}）天干{sg}·地支{bg} | 藏干：{hs}"
+                f"{nm}{p.get('stem','')}{p.get('branch','')}({p.get('element','')}){sg}/{bg}[{hs}]"
             )
 
         # 十神汇总（只列出现过的，附速查提示）
@@ -176,15 +190,11 @@ def build_messages(chart_data: dict, user_message: str, history: Optional[list] 
             [f"{g}→{GOD_HINTS.get(g, '')}" for g in sorted(all_gods) if g in GOD_HINTS]
         )
 
-        context_blocks.append(f"""【五行能量数据】
-日主{dm}（{bazi_info.get('day_master_yin_yang', '')}）→ {dm_trait}
-{sl}（评分{strength.get('score', 'N/A')}）→ {si}
+        context_blocks.append(f"""【八字】
+日主{dm}·{sl}({strength.get('score', 'N/A')})·{dm_trait}
 {'; '.join(strength.get('details', []))}
-
-四柱：
-{chr(10).join(pillar_lines)}
-
-十神速查：{god_note}""")
+{' | '.join(pillar_lines)}
+十神: {god_note}""")
 
     # 星宿信息（含关系系统）
     if star_info:
@@ -208,22 +218,23 @@ def build_messages(chart_data: dict, user_message: str, history: Optional[list] 
                 for t, info in type_groups.items():
                     grades_str = '、'.join(info['grades'])
                     first_sentence = info['dynamic'].split('。')[0] if info['dynamic'] else ''
-                    rel_lines.append(f"  {info['tag']}型——{first_sentence}\n    代表星宿：{grades_str}\n    优势：{info['strength']}\n    风险：{info['risk']}")
+                    rel_lines.append(f"{info['tag']}型—{first_sentence} 代表:{grades_str} 优:{info['strength']} 险:{info['risk']}")
             except Exception:
                 pass
 
-        context_blocks.append(f"""【星宿数据】
-{mansion_name}（{star_info.get('element', '')}·{star_info.get('direction', '')}方·{star_info.get('animal', '')}）
-性格关键词：{star_info.get('personality', 'N/A')}
-
-星宿关系地图 — {mansion_name}与其他星宿的六种适配关系：
-{chr(10).join(rel_lines) if rel_lines else '（关系数据暂不可用）'}""")
+        context_blocks.append(f"""【星宿】
+{mansion_name}({star_info.get('element', '')}·{star_info.get('animal', '')}) {star_info.get('personality', 'N/A')}
+关系:
+{chr(10).join(rel_lines) if rel_lines else '（暂不可用）'}""")
 
     # 构建完整消息 — 按模式选择独立 prompt
     base_prompt = SYSTEM_PROMPT_ANSWER if mode == "answer" else SYSTEM_PROMPT_EXPLORE
     system_content = base_prompt + "\n\n==== 用户个人信息（供参考）====\n" + "\n\n".join(context_blocks) + "\n\n==== 以上是用户的计算结果 ====\n请用这些信息辅助分析，但不要全部罗列出来。在用户问到时自然地引用相关数据。"
 
     messages = [{"role": "system", "content": system_content}]
+
+    if context_summary:
+        messages.append({"role": "system", "content": f"[对话历史摘要] {context_summary}"})
 
     if history:
         messages.extend(history)
@@ -233,7 +244,7 @@ def build_messages(chart_data: dict, user_message: str, history: Optional[list] 
     return messages
 
 
-async def chat_stream(chart_data: dict, user_message: str, history: Optional[list] = None, mode: str = "explore") -> AsyncGenerator[str, None]:
+async def chat_stream(chart_data: dict, user_message: str, history: Optional[list] = None, mode: str = "explore", context_summary: str = "") -> AsyncGenerator[str, None]:
     """流式对话接口。
 
     Args:
@@ -249,7 +260,7 @@ async def chat_stream(chart_data: dict, user_message: str, history: Optional[lis
         yield "data: {\"error\": \"API Key 未配置，请联系管理员。\"}\n\n"
         return
 
-    messages = build_messages(chart_data, user_message, history, mode)
+    messages = build_messages(chart_data, user_message, history, mode, context_summary)
 
     async with httpx.AsyncClient(timeout=120.0) as client:
         async with client.stream(
@@ -282,7 +293,7 @@ async def chat_stream(chart_data: dict, user_message: str, history: Optional[lis
                     yield f"data: {data}\n\n"
 
 
-async def chat_non_stream(chart_data: dict, user_message: str, history: Optional[list] = None, mode: str = "explore") -> dict:
+async def chat_non_stream(chart_data: dict, user_message: str, history: Optional[list] = None, mode: str = "explore", context_summary: str = "") -> dict:
     """非流式对话接口（备用）。
 
     Returns:
@@ -291,7 +302,7 @@ async def chat_non_stream(chart_data: dict, user_message: str, history: Optional
     if not DEEPSEEK_API_KEY:
         return {"reply": "", "error": "API Key 未配置，请联系管理员。"}
 
-    messages = build_messages(chart_data, user_message, history, mode)
+    messages = build_messages(chart_data, user_message, history, mode, context_summary)
 
     async with httpx.AsyncClient(timeout=120.0) as client:
         response = await client.post(
