@@ -49,12 +49,12 @@ MANSION_DATA = {
 
 # 每个农历月的起始星宿索引（正月到十二月）
 # 正月: 室宿(12), 二月: 奎宿(14), 三月: 胃宿(16), 四月: 毕宿(18)
-# 五月: 参宿(20), 六月: 鬼宿(21), 七月: 张宿(24), 八月: 角宿(0)
+# 五月: 参宿(20), 六月: 鬼宿(22), 七月: 张宿(25), 八月: 角宿(0)
 # 九月: 氐宿(2), 十月: 心宿(4), 十一月: 斗宿(7), 十二月: 虚宿(10)
 # 验证：1995年正月初十 → (12+10-1)%28=21 → 井宿 ✓
 MONTH_START_MANSION = {
     1: 12, 2: 14, 3: 16, 4: 18,
-    5: 20, 6: 21, 7: 24, 8: 0,
+    5: 20, 6: 22, 7: 25, 8: 0,
     9: 2, 10: 4, 11: 7, 12: 10,
 }
 
@@ -65,10 +65,28 @@ _JIAO_REF = 203.84  # 角宿起始黄经
 _MANSION_WIDTH = 360.0 / 28.0
 
 
+def _norm_mansion_result(name: str, idx: int, method: str) -> dict:
+    """将牛宿合并到女宿（现代二十七宿体系）。"""
+    if idx == 9:  # 牛宿
+        name = "女宿"
+        idx = 10
+    data = MANSION_DATA.get(name, {})
+    return {
+        "name": name,
+        "index": idx,
+        "element": data.get("element", ""),
+        "animal": data.get("animal", ""),
+        "direction": data.get("direction", ""),
+        "personality": data.get("personality", ""),
+        "method": method,
+    }
+
+
 def get_mansion_by_moon_longitude(moon_ecliptic_lon: float) -> dict:
     """根据月亮实际黄经（天文计算）确定二十八宿。
 
     使用等分法，以角宿一 (Spica) 黄经为参考起点。
+    牛宿自动合并到女宿。
 
     Args:
         moon_ecliptic_lon: 月亮的黄道经度 (0-360)
@@ -80,17 +98,7 @@ def get_mansion_by_moon_longitude(moon_ecliptic_lon: float) -> dict:
     offset = (moon_ecliptic_lon - _JIAO_REF) % 360
     mansion_idx = int(offset / _MANSION_WIDTH) % 28
     mansion_name = MANSION_NAMES[mansion_idx]
-    data = MANSION_DATA.get(mansion_name, {})
-
-    return {
-        "name": mansion_name,
-        "index": mansion_idx + 1,
-        "element": data.get("element", ""),
-        "animal": data.get("animal", ""),
-        "direction": data.get("direction", ""),
-        "personality": data.get("personality", ""),
-        "method": "moon_longitude",
-    }
+    return _norm_mansion_result(mansion_name, mansion_idx + 1, "moon_longitude")
 
 
 def get_mansion_by_lunar_date(lunar_month: int, lunar_day: int, lunar_year: int = 2024, is_leap: bool = False) -> dict:
@@ -100,6 +108,7 @@ def get_mansion_by_lunar_date(lunar_month: int, lunar_day: int, lunar_year: int 
     例如：正月起始为室宿，正月初十 = 井宿。
     闰月：太阳实际已进入下一中气区域，使用下一月的起始宿。
       例如：闰五月 → 使用六月的起始宿（井宿）计算。
+    牛宿自动合并到女宿。
 
     Args:
         lunar_month: 农历月 (1-12)
@@ -115,19 +124,13 @@ def get_mansion_by_lunar_date(lunar_month: int, lunar_day: int, lunar_year: int 
     if is_leap:
         effective_month = lunar_month + 1 if lunar_month < 12 else 1
     start_idx = MONTH_START_MANSION.get(effective_month, 0)
-    mansion_idx = (start_idx + lunar_day - 1) % 28
+    mansion_idx = start_idx
+    for _ in range(lunar_day - 1):
+        mansion_idx = (mansion_idx + 1) % 28
+        if mansion_idx == 8:  # 跳过牛宿（已合并到女宿）
+            mansion_idx = (mansion_idx + 1) % 28
     mansion_name = MANSION_NAMES[mansion_idx]
-    data = MANSION_DATA.get(mansion_name, {})
-
-    return {
-        "name": mansion_name,
-        "index": mansion_idx + 1,
-        "element": data.get("element", ""),
-        "animal": data.get("animal", ""),
-        "direction": data.get("direction", ""),
-        "personality": data.get("personality", ""),
-        "method": "lunar_month",
-    }
+    return _norm_mansion_result(mansion_name, mansion_idx + 1, "lunar_month")
 
 
 # ═══════════════════════════════════════════
@@ -181,76 +184,136 @@ RELATIONSHIP_MODES = {
 }
 
 # ═══════════════════════════════════════════
-# 距离 → 关系类型 + 等级 映射（修正版）
-# 验证：d=1近荣亲, d=6中安坏, d=7中友衰, d=14远危成
-# 规律：荣亲→安坏→友衰→危成 循环，第1次=近,第2次=中,第3次=远
-#       d=12/13=业胎, d=14=远危成(正对位)
+# 距离 → 关系类型 + 等级 映射
+# 规律：近段(d1-4) 荣亲→友衰→安坏→危成
+#       中段(d5-8) 逆序 危成→安坏→友衰→荣亲
+#       业胎 d=9
+#       远段(d10-14) 荣亲→友衰→安坏… d=13 按方向分流, d=14 危成(正对位)
 # ═══════════════════════════════════════════
 
-# 最短距离 → (关系类型, 等级)
+# 最短距离 → (关系类型, 等级)（d=13 需要在代码中按 CW 方向分流）
+# 二十七宿（牛宿并入女宿）距离 → 关系类型映射
+# 27 宿圆周上，d = 1-13，对应六种关系类型的近/中/远三个等级
 _DISTANCE_MAP = {
     0:  ("命之星", ""),
     1:  ("荣亲", "近"),
-    2:  ("安坏", "近"),
-    3:  ("友衰", "近"),
+    2:  ("友衰", "近"),
+    3:  ("安坏", "近"),
     4:  ("危成", "近"),
-    5:  ("荣亲", "中"),
+    5:  ("危成", "中"),
     6:  ("安坏", "中"),
     7:  ("友衰", "中"),
-    8:  ("危成", "中"),
-    9:  ("荣亲", "远"),
-    10: ("安坏", "远"),
+    8:  ("荣亲", "中"),
+    9:  ("业胎", ""),
+    10: ("荣亲", "远"),
     11: ("友衰", "远"),
-    12: ("业胎", ""),
-    13: ("业胎", ""),
-    14: ("危成", "远"),
+    12: ("安坏", "远"),
+    13: ("危成", "远"),
+}
+
+# CW_eff ≤ 13 (SHORT 路径) 时的角色
+_ROLES_CW_SHORT = {
+    (1, "荣亲"): ("亲", "荣"),
+    (2, "友衰"): ("友", "衰"),
+    (3, "安坏"): ("坏", "安"),
+    (4, "危成"): ("成", "危"),
+    (5, "危成"): ("危", "成"),
+    (6, "安坏"): ("安", "坏"),
+    (7, "友衰"): ("衰", "友"),
+    (8, "荣亲"): ("荣", "亲"),
+    (9, "业胎"): ("胎", "业"),
+    (10, "荣亲"): ("亲", "荣"),
+    (11, "友衰"): ("友", "衰"),
+    (12, "安坏"): ("坏", "安"),
+    (13, "危成"): ("成", "危"),
+}
+
+# CW_eff ≥ 14 (LONG 路径) 时的角色
+_ROLES_CW_LONG = {
+    (1, "荣亲"): ("荣", "亲"),
+    (2, "友衰"): ("衰", "友"),
+    (3, "安坏"): ("安", "坏"),
+    (4, "危成"): ("危", "成"),
+    (5, "危成"): ("成", "危"),
+    (6, "安坏"): ("坏", "安"),
+    (7, "友衰"): ("友", "衰"),
+    (8, "荣亲"): ("亲", "荣"),
+    (9, "业胎"): ("业", "胎"),
+    (10, "荣亲"): ("荣", "亲"),
+    (11, "友衰"): ("衰", "友"),
+    (12, "安坏"): ("安", "坏"),
+    (13, "危成"): ("危", "成"),
 }
 
 
-def _get_roles(rel_type: str, clockwise: int) -> tuple:
-    """返回 (role_a, role_b)，其中 A 是 clockwise 路径的起点。
-
-    规则：CW ≤ 14 时，A 为传统配对中的前一个角色（安/亲/衰/危/业），
-    荣亲、安坏、友衰中"前角色"偏向被动方，危成中"危"为主动方。
-    """
-    if rel_type == "安坏":
-        return ("安", "坏") if clockwise <= 14 else ("坏", "安")
-    elif rel_type == "友衰":
-        return ("衰", "友") if clockwise <= 14 else ("友", "衰")
-    elif rel_type == "荣亲":
-        return ("亲", "荣") if clockwise <= 14 else ("荣", "亲")
-    elif rel_type == "危成":
-        return ("危", "成") if clockwise <= 14 else ("成", "危")
-    elif rel_type == "业胎":
-        return ("业", "胎") if clockwise <= 14 else ("胎", "业")
-    return ("", "")
+def _get_roles(rel_type: str, cw_eff: int, d_eff: int) -> tuple:
+    """返回 (role_a, role_b)，基于 27 宿有效圆周上的 CW 方向。"""
+    key = (d_eff, rel_type)
+    if cw_eff <= 13:
+        return _ROLES_CW_SHORT.get(key, ("", ""))
+    else:
+        return _ROLES_CW_LONG.get(key, ("", ""))
 
 
 # ═══════════════════════════════════════════
-# 28×28 硬编码关系查找表（模块加载时一次性生成）
+# 27×27 硬编码关系查找表（模块加载时一次性生成）
+# 牛宿已并入女宿，使用 27 宿有效圆周计算
 # ═══════════════════════════════════════════
 
-_RELATIONSHIP_TABLE: dict = {}  # key: (idx_a, idx_b), value: dict
+_RELATIONSHIP_TABLE: dict = {}  # key: (raw_idx_a, raw_idx_b), value: dict
+
+# 牛宿已并入女宿（现代二十七宿体系）
+_NIUXU_INDEX = 9   # 牛宿
+_NVXU_INDEX = 10   # 女宿（合并目标）
+
+# 原始 28 位置索引 → 27 宿有效索引（牛宿 raw=9 被合并，不参与映射）
+_RAW_TO_EFF: dict = {}
+_EFF_TO_RAW: list = []  # 0-indexed, eff=1 → index 0
+
+
+def _build_effective_mapping():
+    """构建 28→27 索引映射（牛宿合并到女宿）。"""
+    global _RAW_TO_EFF, _EFF_TO_RAW
+    if _RAW_TO_EFF:
+        return
+    for raw in range(1, 29):
+        if raw == _NIUXU_INDEX:
+            _RAW_TO_EFF[raw] = None
+        else:
+            eff = len(_EFF_TO_RAW) + 1
+            _RAW_TO_EFF[raw] = eff
+            _EFF_TO_RAW.append(raw)
 
 
 def _build_relationship_table():
-    """构建完整的 28×28 星宿关系查找表。"""
+    """构建完整的 27×27 星宿关系查找表（基于 27 宿有效圆周）。"""
     global _RELATIONSHIP_TABLE
     if _RELATIONSHIP_TABLE:
         return
-    for a in range(1, 29):
-        for b in range(1, 29):
-            if a == b:
+    _build_effective_mapping()
+
+    for a_raw in range(1, 29):
+        a_eff = _RAW_TO_EFF.get(a_raw)
+        if a_eff is None:
+            continue  # 牛宿跳过
+        for b_raw in range(1, 29):
+            b_eff = _RAW_TO_EFF.get(b_raw)
+            if b_eff is None:
+                continue  # 牛宿跳过
+
+            if a_raw == b_raw:
                 rel_type, grade = "命之星", ""
             else:
-                diff = abs(a - b)
-                d = min(diff, 28 - diff)
-                rel_type, grade = _DISTANCE_MAP[d]
-            clockwise = (b - a) % 28
-            role_a, role_b = _get_roles(rel_type, clockwise)
+                diff_eff = abs(a_eff - b_eff)
+                d_eff = min(diff_eff, 27 - diff_eff)
+                rel_type, grade = _DISTANCE_MAP[d_eff]
+
+            cw_eff = (b_eff - a_eff) % 27
+            role_a, role_b = _get_roles(rel_type, cw_eff, d_eff if a_raw != b_raw else 0)
+
             mode = RELATIONSHIP_MODES.get(rel_type, {})
             label = f"{grade}{rel_type}" if grade else rel_type
-            _RELATIONSHIP_TABLE[(a, b)] = {
+            _RELATIONSHIP_TABLE[(a_raw, b_raw)] = {
                 "type": rel_type,
                 "grade": grade,
                 "label": label,
@@ -267,9 +330,18 @@ def _build_relationship_table():
 # 模块加载时构建
 _build_relationship_table()
 
+# 牛宿已并入女宿（现代二十七宿体系），查询/展示时自动重定向
+# （_NIUXU_INDEX / _NVXU_INDEX 已定义在上方）
+
+def _resolve_mansion(idx: int) -> int:
+    """将牛宿重定向到女宿。"""
+    return _NVXU_INDEX if idx == _NIUXU_INDEX else idx
+
 
 def get_relationship(mansion_idx_a: int, mansion_idx_b: int) -> dict:
     """查询两个星宿之间的关系（从 28×28 硬编码表直接读取）。
+
+    牛宿自动合并到女宿。
 
     Args:
         mansion_idx_a: 第一个星宿的索引 (1-28)
@@ -278,27 +350,34 @@ def get_relationship(mansion_idx_a: int, mansion_idx_b: int) -> dict:
     Returns:
         包含关系类型、等级、角色、互动模式描述的字典
     """
-    return _RELATIONSHIP_TABLE.get((mansion_idx_a, mansion_idx_b), {}).copy()
+    a = _resolve_mansion(mansion_idx_a)
+    b = _resolve_mansion(mansion_idx_b)
+    if a == b and mansion_idx_a != mansion_idx_b:
+        # 牛宿→女宿合并后，两者互为命之星
+        return _RELATIONSHIP_TABLE.get((_NVXU_INDEX, _NVXU_INDEX), {}).copy()
+    return _RELATIONSHIP_TABLE.get((a, b), {}).copy()
 
 
 def get_relationship_map(mansion_idx: int) -> list:
-    """获取某个星宿与全部 28 个星宿的关系地图（去重，每类关系只保留一个代表星宿）。"""
-    # 找出每种关系标签的代表星宿
-    seen = set()
+    """获取某个星宿与全部 26 个其他星宿的关系列表。
+
+    牛宿已并入女宿，不单独列出。
+    """
+    mansion_idx = _resolve_mansion(mansion_idx)
     relations = []
     for i in range(1, 29):
-        if i == mansion_idx:
+        if i == _NIUXU_INDEX:
+            continue  # 牛宿已并入女宿
+        resolved = _resolve_mansion(i)
+        if resolved == mansion_idx:
             continue
         rel = get_relationship(mansion_idx, i)
-        key = rel.get("label", "")
-        if key not in seen:
-            seen.add(key)
-            other_name = MANSION_NAMES[i - 1]
-            other_data = MANSION_DATA.get(other_name, {})
-            rel["mansion"] = other_name
-            rel["mansion_element"] = other_data.get("element", "")
-            rel["mansion_animal"] = other_data.get("animal", "")
-            relations.append(rel)
+        other_name = MANSION_NAMES[i - 1]
+        other_data = MANSION_DATA.get(other_name, {})
+        rel["mansion"] = other_name
+        rel["mansion_element"] = other_data.get("element", "")
+        rel["mansion_animal"] = other_data.get("animal", "")
+        relations.append(rel)
 
     # 按关系类型分组排序：业胎 > 安坏 > 荣亲 > 危成 > 友衰 > 命之星
     type_order = {"业胎": 0, "安坏": 1, "荣亲": 2, "危成": 3, "友衰": 4, "命之星": 5}
