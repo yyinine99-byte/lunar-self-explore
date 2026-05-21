@@ -91,6 +91,18 @@
   .btn-primary:active { transform: scale(0.98); opacity: 0.8; }
   .btn-primary:disabled { opacity: 0.4; pointer-events: none; }
 
+  .btn-report {
+    width: 100%; padding: 14px; margin-top: 10px;
+    border-radius: 12px; border: 1px dashed rgba(200,180,155,0.3);
+    background: rgba(200,180,155,0.05);
+    color: var(--gold); font-size: 15px; font-weight: 600;
+    letter-spacing: 2px; cursor: pointer; transition: all 0.25s;
+    font-family: inherit;
+  }
+  .btn-report:hover { background: rgba(200,180,155,0.12); border-color: var(--gold); }
+  .btn-report:active { transform: scale(0.98); }
+  .btn-report.loading { opacity: 0.6; pointer-events: none; }
+
   .privacy-note { text-align: center; margin-top: 18px; color: rgba(236,229,213,0.15); font-size: 11px; letter-spacing: 1px; line-height: 1.6; }
 
   /* ── Screen 2: Portrait ── */
@@ -1142,6 +1154,42 @@ function refreshDayOptions() {
   }
 }
 
+async function downloadReport() {
+  if (!chartData) { alert('请先生成画像'); return; }
+  const btn = document.getElementById('btn-download-report');
+  const originalText = btn.textContent;
+  btn.textContent = '正在生成报告...';
+  btn.classList.add('loading');
+
+  try {
+    const resp = await fetchWithTimeout('/api/report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chart_data: chartData }),
+    }, 60000, 1);
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ error: '生成失败' }));
+      throw new Error(err.error || `HTTP ${resp.status}`);
+    }
+
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '你的性格使用说明书.pdf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    alert('报告生成失败：' + (e.message || '网络异常'));
+  } finally {
+    btn.textContent = originalText;
+    btn.classList.remove('loading');
+  }
+}
+
 function newChart() {
   // 清空旧数据，开始新画像
   chartData = null;
@@ -1396,6 +1444,7 @@ function renderPortrait(data) {
   </div>`;
 
   html += `<button class="btn btn-primary" onclick="startChat()">✦ 开始 AI 深度分析</button>`;
+  html += `<button class="btn-report" id="btn-download-report" onclick="downloadReport()">📄 下载你的性格使用说明书</button>`;
   html += `<div style="display:flex;gap:8px;margin-top:8px;">
     <button class="btn-back" style="flex:1" onclick="backToInput()">修改信息</button>
     <button class="btn-back" style="flex:1" onclick="newChart()">新建画像</button>

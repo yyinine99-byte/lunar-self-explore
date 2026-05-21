@@ -12,7 +12,7 @@ import uuid
 from typing import Optional
 
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, StreamingResponse, JSONResponse
+from fastapi.responses import HTMLResponse, StreamingResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import os
@@ -22,6 +22,7 @@ from bazi_calculator import compute_bazi
 from star_database import get_mansion_by_lunar_date, get_mansion_by_moon_longitude
 from lunar_calendar import solar_to_lunar
 from ai_service import chat_stream, chat_non_stream
+from pdf_report import generate_pdf
 from rate_limiter import chat_limiter, chart_limiter
 
 app = FastAPI(title="AI 自我探索工具", version="0.1.0")
@@ -220,6 +221,38 @@ async def health_check():
         "api_key_configured": bool(os.environ.get("DEEPSEEK_API_KEY", "")),
         "image_api_configured": bool(os.environ.get("IMAGE_GEN_API_KEY", "")),
     }
+
+
+class ReportRequest(BaseModel):
+    chart_data: dict
+
+
+@app.post("/api/report")
+async def api_report(request: Request, body: ReportRequest):
+    """生成 PDF 性格报告。"""
+    client_ip = request.client.host if request.client else "unknown"
+    if not chart_limiter.allow(client_ip):
+        return JSONResponse(
+            status_code=429,
+            content={"error": "请求太频繁，请稍后再试"},
+        )
+
+    try:
+        # 构造前端 URL 用于 QR 码
+        app_url = str(request.base_url).rstrip("/")
+
+        pdf_bytes = generate_pdf(body.chart_data, app_url)
+
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": "attachment; filename*=UTF-8''%E4%BD%A0%E7%9A%84%E6%80%A7%E6%A0%BC%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+                "Cache-Control": "no-cache",
+            },
+        )
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": f"报告生成失败: {str(e)}"})
 
 
 class ImageGenRequest(BaseModel):
