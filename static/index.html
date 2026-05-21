@@ -966,6 +966,29 @@ function generateUUID() {
   });
 }
 
+// Fetch with timeout and optional retry (for cold-start / network hiccup recovery)
+async function fetchWithTimeout(url, options, timeoutMs = 30000, retries = 1) {
+  let lastError;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const resp = await fetch(url, { ...options, signal: controller.signal });
+      clearTimeout(timer);
+      return resp;
+    } catch (e) {
+      clearTimeout(timer);
+      lastError = e;
+      if (attempt < retries && (e.name === 'AbortError' || e.name === 'TypeError')) {
+        await new Promise(r => setTimeout(r, 1500 * (attempt + 1)));
+        continue;
+      }
+      throw e;
+    }
+  }
+  throw lastError;
+}
+
 // Save/restore state
 function saveState() {
   if (!chartData) return;
@@ -1156,11 +1179,11 @@ async function generateChart() {
   };
 
   try {
-    const resp = await fetch('/api/chart', {
+    const resp = await fetchWithTimeout('/api/chart', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
-    });
+    }, 30000, 1);
 
     if (!resp.ok) {
       const err = await resp.json();
@@ -1175,7 +1198,8 @@ async function generateChart() {
     renderPortrait(chartData);
     saveState();
   } catch (e) {
-    alert('计算失败: ' + e.message);
+    const msg = e.name === 'AbortError' ? '请求超时，请检查网络后重试' : e.message;
+    alert('计算失败: ' + msg);
     btn.disabled = false;
     btn.textContent = '✦ 生成我的画像';
   }
@@ -1479,17 +1503,20 @@ async function sendMessage(msg) {
   const typingId = addTypingIndicator();
 
   try {
-    const resp = await fetch('/api/chat', {
+    // Trim history to prevent payload bloat (keep last 20 messages = 10 rounds)
+    const trimmedHistory = chatHistory.length > 20 ? chatHistory.slice(-20) : chatHistory;
+
+    const resp = await fetchWithTimeout('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         session_id: sessionId,
         message: message,
         chart_data: chartData,
-        history: chatHistory.slice(0, -1),
+        history: trimmedHistory.slice(0, -1),
         mode: chatMode,
       }),
-    });
+    }, 120000, 1);
 
     if (!resp.ok) {
       const err = await resp.json();
@@ -1504,17 +1531,25 @@ async function sendMessage(msg) {
     const decoder = new TextDecoder();
     let fullContent = '';
     let buffer = '';
+    let streamDone = false;
+    const STREAM_CHUNK_TIMEOUT = 15000; // 15s no data → stall detected
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
+    while (!streamDone) {
+      const readPromise = reader.read();
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new DOMException('Stream chunk timeout', 'TimeoutError')), STREAM_CHUNK_TIMEOUT)
+      );
+      const { done, value } = await Promise.race([readPromise, timeoutPromise]);
+
+      if (done) { streamDone = true; break; }
+
       buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split('\n');
       buffer = lines.pop() || '';
       for (const line of lines) {
         if (!line.startsWith('data: ')) continue;
         const data = line.slice(6);
-        if (data === '[DONE]') break;
+        if (data === '[DONE]') { streamDone = true; break; }
         try {
           const parsed = JSON.parse(data);
           const delta = parsed.choices?.[0]?.delta?.content;
@@ -1536,23 +1571,27 @@ async function sendMessage(msg) {
     }
   } catch (e) {
     removeTypingIndicator(typingId);
-    addMessage('assistant', '出了点问题：' + e.message + '\n请稍后重试。');
+    let errMsg = e.message || '网络异常，请稍后重试';
+    if (e.name === 'AbortError') errMsg = '请求超时，请稍后重试';
+    if (e.name === 'TimeoutError') errMsg = '响应中断，请重新发送这条消息';
+    addMessage('assistant', '出了点问题：' + errMsg);
   }
 }
 
 async function fallbackNonStream(message) {
   try {
-    const resp = await fetch('/api/chat/sync', {
+    const trimmedHistory = chatHistory.length > 20 ? chatHistory.slice(-20) : chatHistory;
+    const resp = await fetchWithTimeout('/api/chat/sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         session_id: sessionId,
         message: message,
         chart_data: chartData,
-        history: chatHistory.slice(0, -1),
+        history: trimmedHistory.slice(0, -1),
         mode: chatMode,
       }),
-    });
+    }, 60000, 1);
     const data = await resp.json();
     if (data.reply) {
       addMessage('assistant', data.reply);
@@ -1562,7 +1601,8 @@ async function fallbackNonStream(message) {
       addMessage('assistant', '请求失败：' + (data.error || '未知错误'));
     }
   } catch (e) {
-    addMessage('assistant', '网络请求失败，请检查连接后重试。');
+    const msg = e.name === 'AbortError' ? '请求超时，请稍后重试' : '网络请求失败，请检查连接后重试。';
+    addMessage('assistant', msg);
   }
 }
 

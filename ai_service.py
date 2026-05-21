@@ -251,7 +251,7 @@ async def chat_stream(chart_data: dict, user_message: str, history: Optional[lis
 
     messages = build_messages(chart_data, user_message, history, mode)
 
-    async with httpx.AsyncClient(timeout=60.0) as client:
+    async with httpx.AsyncClient(timeout=120.0) as client:
         async with client.stream(
             "POST",
             DEEPSEEK_API_URL,
@@ -265,7 +265,7 @@ async def chat_stream(chart_data: dict, user_message: str, history: Optional[lis
                 "messages": messages,
                 "stream": True,
                 "temperature": 0.7,
-                "max_tokens": 2048,
+                "max_tokens": 4096,
             },
         ) as response:
             if response.status_code != 200:
@@ -293,7 +293,7 @@ async def chat_non_stream(chart_data: dict, user_message: str, history: Optional
 
     messages = build_messages(chart_data, user_message, history, mode)
 
-    async with httpx.AsyncClient(timeout=60.0) as client:
+    async with httpx.AsyncClient(timeout=120.0) as client:
         response = await client.post(
             DEEPSEEK_API_URL,
             headers={
@@ -305,7 +305,7 @@ async def chat_non_stream(chart_data: dict, user_message: str, history: Optional
                 "messages": messages,
                 "stream": False,
                 "temperature": 0.7,
-                "max_tokens": 2048,
+                "max_tokens": 4096,
             },
         )
 
