@@ -65,15 +65,6 @@
   }
   .form-input:focus, .form-select:focus { border-color: var(--gold-dim); }
   .form-input::placeholder { color: rgba(236,229,213,0.25); }
-  input[type="time"].form-input {
-    -webkit-appearance: auto;
-    color-scheme: dark;
-    min-height: 44px;
-  }
-  input[type="time"].form-input::-webkit-calendar-picker-indicator {
-    filter: invert(0.8);
-    cursor: pointer;
-  }
   .form-row { display: flex; gap: 6px; }
   .form-row > * { flex: 1; min-width: 0; }
   .form-select {
@@ -366,7 +357,10 @@
 
     <div class="form-group">
       <label class="form-label">出生时间</label>
-      <input type="time" class="form-input" id="birth-time" placeholder="12:00">
+      <div class="form-row">
+        <select class="form-select" id="birth-hour"><option value="">时</option></select>
+        <select class="form-select" id="birth-minute"><option value="">分</option></select>
+      </div>
       <div class="form-hint">不确定具体时间可选一个大概的时间</div>
     </div>
 
@@ -905,6 +899,28 @@ function initDateSelects() {
 }
 
 // ═══════════════════════════════════════════
+// Time Selects
+// ═══════════════════════════════════════════
+function initTimeSelects() {
+  const hSel = document.getElementById('birth-hour');
+  const mSel = document.getElementById('birth-minute');
+
+  for (let h = 0; h <= 23; h++) {
+    const opt = document.createElement('option');
+    opt.value = h; opt.textContent = String(h).padStart(2, '0') + '时';
+    if (h === 12) opt.selected = true;
+    hSel.appendChild(opt);
+  }
+
+  for (let min = 0; min <= 59; min++) {
+    const opt = document.createElement('option');
+    opt.value = min; opt.textContent = String(min).padStart(2, '0') + '分';
+    if (min === 0) opt.selected = true;
+    mSel.appendChild(opt);
+  }
+}
+
+// ═══════════════════════════════════════════
 // Location Cascading
 // ═══════════════════════════════════════════
 function onCountryChange() {
@@ -1064,7 +1080,8 @@ function saveState() {
       year: document.getElementById('birth-year').value,
       month: document.getElementById('birth-month').value,
       day: document.getElementById('birth-day').value,
-      time: document.getElementById('birth-time').value,
+      hour: document.getElementById('birth-hour').value,
+      minute: document.getElementById('birth-minute').value,
       country: document.getElementById('country').value,
       province: document.getElementById('province').value,
       city: document.getElementById('city').value,
@@ -1101,7 +1118,8 @@ function restoreState() {
       if (fv.year) document.getElementById('birth-year').value = fv.year;
       if (fv.month) document.getElementById('birth-month').value = fv.month;
       if (fv.day) document.getElementById('birth-day').value = fv.day;
-      if (fv.time) document.getElementById('birth-time').value = fv.time;
+      if (fv.hour) document.getElementById('birth-hour').value = fv.hour;
+      if (fv.minute) document.getElementById('birth-minute').value = fv.minute;
       if (fv.gender) document.getElementById('gender').value = fv.gender;
       if (fv.country) document.getElementById('country').value = fv.country;
       onCountryChange();
@@ -1210,7 +1228,8 @@ function newChart() {
   document.getElementById('birth-year').value = '';
   document.getElementById('birth-month').value = '';
   document.getElementById('birth-day').value = '';
-  document.getElementById('birth-time').value = '12:00';
+  document.getElementById('birth-hour').value = '12';
+  document.getElementById('birth-minute').value = '00';
   document.getElementById('country').value = '中国';
   document.getElementById('gender').value = '';
   onCountryChange();
@@ -1237,7 +1256,8 @@ async function generateChart() {
   const y = parseInt(document.getElementById('birth-year').value);
   const m = parseInt(document.getElementById('birth-month').value);
   const d = parseInt(document.getElementById('birth-day').value);
-  const timeVal = document.getElementById('birth-time').value;
+  const hVal = document.getElementById('birth-hour').value;
+  const minVal = document.getElementById('birth-minute').value;
   const countryVal = document.getElementById('country').value;
   const provinceVal = document.getElementById('province').value;
   const cityVal = document.getElementById('city').value;
@@ -1245,7 +1265,7 @@ async function generateChart() {
 
   const missing = [];
   if (!y || !m || !d) missing.push('出生日期（年/月/日）');
-  if (!timeVal) missing.push('出生时间');
+  if (!hVal || !minVal) missing.push('出生时间');
   if (!countryVal) missing.push('国家');
   if (!provinceVal) missing.push('省份');
   if (!cityVal) missing.push('城市');
@@ -1255,7 +1275,7 @@ async function generateChart() {
     alert('请完善以下信息后再生成画像：\n\n' + missing.join('\n'));
     // 高亮第一个缺失字段
     const firstMissing = !y || !m || !d ? 'birth-year' :
-      !timeVal ? 'birth-time' :
+      (!hVal || !minVal) ? 'birth-hour' :
       !countryVal ? 'country' :
       !provinceVal ? 'province' :
       !cityVal ? 'city' : 'gender';
@@ -1272,7 +1292,7 @@ async function generateChart() {
 
   const payload = {
     birth_date: birthDate,
-    birth_time: document.getElementById('birth-time').value || '12:00',
+    birth_time: (document.getElementById('birth-hour').value || '12') + ':' + (document.getElementById('birth-minute').value || '00'),
     longitude: coords.lon,
     latitude: coords.lat,
     gender: document.getElementById('gender').value || 'male',
@@ -1326,7 +1346,7 @@ function renderPortrait(data) {
     (document.getElementById('birth-year').value || '--') + '-' +
     (document.getElementById('birth-month').value || '--') + '-' +
     (document.getElementById('birth-day').value || '--') + ' · ' +
-    (document.getElementById('birth-time').value || '12:00');
+    (document.getElementById('birth-hour').value || '12') + ':' + (document.getElementById('birth-minute').value || '00');
 
   let html = '';
 
@@ -1875,6 +1895,7 @@ function buildTable(lines) {
 // Bootstrap
 // ═══════════════════════════════════════════
 initDateSelects();
+initTimeSelects();
 initLocation();
 
 // Restore state if user returns to page
