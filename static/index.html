@@ -65,6 +65,15 @@
   }
   .form-input:focus, .form-select:focus { border-color: var(--gold-dim); }
   .form-input::placeholder { color: rgba(236,229,213,0.25); }
+  input[type="time"].form-input {
+    -webkit-appearance: auto;
+    color-scheme: dark;
+    min-height: 44px;
+  }
+  input[type="time"].form-input::-webkit-calendar-picker-indicator {
+    filter: invert(0.8);
+    cursor: pointer;
+  }
   .form-row { display: flex; gap: 6px; }
   .form-row > * { flex: 1; min-width: 0; }
   .form-select {
